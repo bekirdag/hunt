@@ -1,0 +1,54 @@
+body,#canvas{
+	width:100%;
+	height:100%;
+	font-family:arial;
+	color:#444;
+	font-size:12px;
+}
+
+#start{
+	border:1px solid #6275F0;
+	padding:10px;
+	position: absolute;
+	top: 20px; 
+	left: 20px;
+	cursor:pointer;
+	width:120px;
+}
+
+#hunter {
+	position: absolute;
+	width: 20px; height: 20px;
+	top: 150px; left: 800px;
+	background: #bada55;
+	border-radius: 3px;
+	-webkit-backface-visibility:hidden;
+}
+
+#hunter2 {
+	position: absolute;
+	width: 20px; height: 20px;
+	top: 50px; left: 1000px;
+	background: #ff0000;
+	border-radius: 3px;
+	-webkit-backface-visibility:hidden;
+}
+
+#hunter3 {
+	position: absolute;
+	width: 20px; height: 20px;
+	top: 500px; left: 1000px;
+	background: blue;
+	border-radius: 3px;
+	-webkit-backface-visibility:hidden;
+}
+
+#pray {
+	position: absolute;
+	width: 20px; height: 20px;
+	top: 10px; left: 600px;
+	background: yellow;
+	border-radius: 10px;
+	-webkit-backface-visibility:hidden;
+	border:1px solid #aaa;
+}
