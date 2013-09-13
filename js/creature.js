@@ -13,7 +13,7 @@ function go(me,x,y) {
 		in_edge_x = true;
 	}
 	else if (x<0){
-		x = window_w-20;
+		x = window_w-1;
 		in_edge_x = true;
 	}
 	
@@ -23,7 +23,7 @@ function go(me,x,y) {
 		in_edge_y = true;
 	}
 	else if (y<0){
-		y = window_h-20;
+		y = window_h-1;
 		in_edge_y = true;
 	}
 
