@@ -7,28 +7,26 @@ function go(me,x,y) {
 	var count = speed;
 	var in_edge_x = false;
 	var in_edge_y = false;
-	if(x>window_w)
+	if(x>=window_w+20)
 	{
-		x = 1;
+		x = -9.99*2;
 		in_edge_x = true;
 	}
-	else if (x<0){
-		x = window_w-1;
+	else if (x<-20){
+		x = window_w-0.02;
 		in_edge_x = true;
 	}
 	
-	if(y>window_h)
+	if(y>=window_h+20)
 	{
-		y = 1;
+		y = -9.99*2;
 		in_edge_y = true;
 	}
-	else if (y<0){
-		y = window_h-1;
+	else if (y<-20){
+		y = window_h-0.02;
 		in_edge_y = true;
 	}
 
-	// me_o.style.left = x+"px";
-	// me_o.style.top = y+"px";
 	var my_position = $("#"+me).position();
 	if(in_edge_x)
 	{
@@ -57,11 +55,6 @@ function go(me,x,y) {
 			me_o.style.top = first_pos_y - y_dif/count * i + "px" ;
 		};
 	}
-}
-
-function smooth_move(item,x,y)
-{
-	
 }
 
 function get_position(me,him,action) {
@@ -122,61 +115,67 @@ function get_position(me,him,action) {
 	return {x:final_x,y:final_y,distance:distance};
 }
 
-function seeing(me,him) {
-	var his_position = $("#"+him).position();
-	var my_position = $("#"+me).position();
+function seeing(me,him,action) {
+	var items = him;
+	var seeing = 0;
+	var pos = [];
+	var total_distance = 0;
+
+	for (var i=0; i < items.length; i++) {
+		var him = items[i];
+		var h_el = $("#"+him);
+		// console.log(h_el);
+		var his_position = h_el.position();
+		var my_position = $("#"+me).position();
+
+		var x2 = my_position.left-his_position.left;
+		var y2 = my_position.top-his_position.top;
+
+		// also look from the edge of the window
+
+		var abs_x2 = Math.abs(x2);
+		var abs_y2 = Math.abs(y2);
+
+		var x2_alt = window_w - abs_x2;
+		var y2_alt = window_h - abs_y2;
+
+		x2 = (x2_alt<abs_x2) ? x2_alt : abs_x2;
+		y2 = (y2_alt<abs_y2) ? y2_alt : abs_y2;
+
+		var eyesight = $("#"+me).attr("eyesightfactor") * ($("#"+me).width() + $("#"+me).height())/4;
+
+		var distance = Math.sqrt(Math.pow(x2,2) + Math.pow(y2,2));
+
+		if(eyesight>distance) 
+		{
+			new_position = get_position(me,items[i],action);
+			pos[seeing]= {x:new_position.x,y:new_position.y,distance:new_position.distance,weight:0};
+			total_distance += new_position.distance;
+			seeing++;
+		}
+	}
 	
-	var x2 = my_position.left-his_position.left;
-	var y2 = my_position.top-his_position.top;
-	
-	// also look from the edge of the window
-	
-	var abs_x2 = Math.abs(x2);
-	var abs_y2 = Math.abs(y2);
-	
-	var x2_alt = window_w - abs_x2;
-	var y2_alt = window_h - abs_y2;
-	
-	x2 = (x2_alt<abs_x2) ? x2_alt : abs_x2;
-	y2 = (y2_alt<abs_y2) ? y2_alt : abs_y2;
-	
-	var eyesight = $("#"+me).attr("eyesightfactor") * ($("#"+me).width() + $("#"+me).height())/2;
-	
-	var distance = Math.sqrt(Math.pow(x2,2) + Math.pow(y2,2));
-	
-	if(eyesight>distance) 
+	if(seeing>0)
 	{
-		return true;
+		var saw = {items: pos, total_distance:total_distance}
+		return saw;
 	}
 	else
 	{
 		return false;
 	}
+	
 }
 
 function tag(me,from,action) {
+	from_string = from;
 	from = from.split(",");
-	// console.log(from.length);
-	var pos = [];
-	var total_distance = 0;
-	var from_string = "";
-	var iteration = 0;
-	var seeing_anyone = false;
-	for (var i=0; i < from.length; i++) {
-		if(seeing(me,from))
-		{
-			seeing_anyone = true;
-			new_position = get_position(me,from[i],action);
-			pos[i]= {x:new_position.x,y:new_position.y,distance:new_position.distance,weight:0};
-			total_distance += new_position.distance;
-			iteration++;
-		}
-		from_string += from[i]+",";
-	};
-
-	from_string = from_string.slice(0, -1);
-	if(seeing_anyone)
+	var saw = seeing(me,from,action);
+	if(saw)
 	{
+		var pos = saw.items;
+		total_distance = saw.total_distance;
+
 		posx = 0;
 		posy = 0;
 		var total_we = 0;
@@ -191,11 +190,15 @@ function tag(me,from,action) {
 		};
 	
 		go(me,posx,posy);
+		var timer = 30;
+	}
+	else
+	{
+		var timer = 1000;
 	}
 	
 	me_o = document.getElementById(me);
-	him_o = document.getElementById(from);
 	
-	setTimeout('tag("'+me_o.getAttribute("id")+'","'+from_string+'","'+action+'")', 30);
+	setTimeout('tag("'+me_o.getAttribute("id")+'","'+from_string+'","'+action+'")', timer);
 }
 

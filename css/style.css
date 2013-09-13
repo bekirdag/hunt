@@ -28,7 +28,7 @@ body,#canvas{
 #hunter2 {
 	position: absolute;
 	width: 20px; height: 20px;
-	top: 50px; left: 1000px;
+	top: 150px; left: 1000px;
 	background: #ff0000;
 	border-radius: 3px;
 	-webkit-backface-visibility:hidden;
@@ -37,7 +37,7 @@ body,#canvas{
 #hunter3 {
 	position: absolute;
 	width: 20px; height: 20px;
-	top: 500px; left: 1000px;
+	top: 300px; left: 120px;
 	background: blue;
 	border-radius: 3px;
 	-webkit-backface-visibility:hidden;
@@ -64,7 +64,7 @@ body,#canvas{
 #hunter6 {
 	position: absolute;
 	width: 20px; height: 20px;
-	top: 10px; left: 100px;
+	top: 170px; left: 100px;
 	background: purple;
 	border-radius: 3px;
 	-webkit-backface-visibility:hidden;
@@ -88,24 +88,26 @@ body,#canvas{
 	-webkit-backface-visibility:hidden;
 }
 
-#pray,#pray2,#pray3,#pray4 {
+#prey,#prey2,#prey3,#prey4,#prey5 {
 	position: absolute;
 	width: 20px; height: 20px;
-	top: 10px; left: 600px;
-	background: yellow;
+	top: 140px; left: 600px;
+	background: black;
 	border-radius: 10px;
 	-webkit-backface-visibility:hidden;
-	border:2px solid #aaa;
+/*	border:2px solid #aaa;*/
 }
 
-#pray2{
-	top: 100px; left: 150px;
+#prey2{
+	top: 300px; left: 450px;
 }
 
-#pray3{
-	top: 150px; left: 200px;
+#prey3{
+	top: 150px; left: 600px;
 }
 
-#pray4{
+#prey4{
 	top: 200px; left: 250px;
 }
+
+
