@@ -6,35 +6,52 @@
 	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 	<script src="js/creature.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
+	<script type="text/javascript">
+		$(document).ready(function(){
+			// Start animation, set who is going to follow who, who will run away (from who) etc.
+			$("#start").click(function(){
+				
+				// var hunter = document.getElementById("hunter");
+				// hunter.addEventListener("load", follow('hunter','pray'));
+				
+				tag('hunter','pray,pray2,pray3,pray4,pray5','get_closer');
+				tag('hunter2','pray,pray2,pray3,pray4,pray5','get_closer');
+				tag('hunter3','pray,pray2,pray3,pray4,pray5','get_closer');
+				tag('hunter4','pray,pray2,pray3,pray4,pray5','get_closer');
+				tag('hunter5','pray,pray2,pray3,pray4,pray5','get_closer');
+				tag('hunter6','pray,pray2,pray3,pray4,pray5','get_closer');
+				tag('hunter7','pray,pray2,pray3,pray4,pray5','get_closer');
+				tag('hunter8','pray,pray2,pray3,pray4,pray5','get_closer');
 
-<body>
+				tag('pray','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
+				tag('pray2','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
+				tag('pray3','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
+				tag('pray4','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
+				tag('pray5','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
+				$(this).hide();
+			});
 
-	<section id="canvas">
-		<div id="hunter" speed="1.2" class="org"></div>
-		<div id="hunter2" speed="1.3" class="org"></div>
-		<div id="hunter3" speed="1" class="org"></div>
-		<div id="pray" speed="1" class="org"></div>
-	</section>
-	
-	<div id="start">Click to start</div>
+			$(".org").draggable();
 
-<script type="text/javascript">
-	$(document).ready(function(){
-		// Start animation, set who is going to follow who, who will run away (from who) etc.
-		$("#start").click(function(){
-			follow('hunter','pray');
-			follow('hunter2','pray');
-			follow('hunter3','pray');
-
-			run('pray','hunter');
-			run('pray','hunter2');
-			run('pray','hunter3');
-			$(this).hide();
 		});
-		
-		$(".org").draggable();
-		
-	});
-</script>
+	</script>
+</head>
+<body>
+	<section id="canvas">
+		<div id="hunter" speed="10" class="org" eyesightfactor="50"></div>
+		<div id="hunter2" speed="12" class="org" eyesightfactor="20"></div>
+		<div id="hunter3" speed="13" class="org" eyesightfactor="30"></div>
+		<div id="hunter4" speed="10" class="org" eyesightfactor="40"></div>
+		<div id="hunter5" speed="8" class="org" eyesightfactor="60"></div>
+		<div id="hunter6" speed="9" class="org" eyesightfactor="30"></div>
+		<div id="hunter7" speed="14" class="org" eyesightfactor="20"></div>
+		<div id="hunter8" speed="10" class="org" eyesightfactor="30"></div>
+		<div id="pray" speed="20" class="org" eyesightfactor="100"></div>
+		<div id="pray2" speed="10" class="org" eyesightfactor="100"></div>
+		<div id="pray3" speed="15" class="org" eyesightfactor="100"></div>
+		<div id="pray4" speed="12" class="org" eyesightfactor="100"></div>
+		<div id="pray5" speed="14" class="org" eyesightfactor="100"></div>
+	</section>
+	<div id="start">Click to start</div>
 </body>
 </html>
