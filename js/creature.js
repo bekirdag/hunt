@@ -58,7 +58,7 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold
 	border_radius = (type=="hunter") ? 3 : 10;
 	var ran_id = rand_id(type);
 	var prey_attr = (type=="prey") ? " mode='safe' danger_time='"+danger_time+"' " : "";
-	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' danger_distance='"+danger_distance+"' linger_rate='"+linger_rate+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
+	$("#canvas").append("<div id='"+ran_id+"' age='0' type='"+type+"' danger_distance='"+danger_distance+"' linger_rate='"+linger_rate+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
 	var item = $("#"+ran_id);
 	item.css("background-color",color);
 	item.css("position","absolute");
@@ -89,6 +89,10 @@ function creature_start(id)
 	{
 		keep_going(type,id,threshold);
 	}
+	$(".org").draggable();
+	$("#"+id).click(function(){
+		$("#oldest").text("Age: " + $(this).attr("age"));
+	});
 }
 
 function keep_going(type,id,threshold)
@@ -143,8 +147,8 @@ function check_predator(me,run_from)
 				// console.log("danger!");
 				me_o.attr("mode","danger");
 				me_o.attr("danger_time",me_o.attr("danger_distance"));
-				me_o.css("background-color","red");
-				// me_o.addClass("red");
+				// me_o.css("background-color","red");
+				me_o.addClass("red");
 			}
 			else
 			{
@@ -152,8 +156,8 @@ function check_predator(me,run_from)
 				{
 					me_o.attr("mode","safe");
 					me_o.attr("danger_time",0);
-					// me_o.removeClass("red");
-					me_o.css("background-color","blue");
+					me_o.removeClass("red");
+					// me_o.css("background-color","blue");
 				}
 			}
 		}
@@ -165,12 +169,15 @@ function kill_slowly()
 	$(".org").each(function(){
 		energy_change($(this).attr("id"),-1);
 		
+		var new_age = parseInt($(this).attr("age"))+1;
+		$(this).attr("age", new_age);
+		
 		//reduce danger times
 		var attr = $(this).attr('danger_time');
 		var mode = $(this).attr('mode');
 
 		if (attr>0) {
-			console.log(attr);
+			// console.log(attr);
 		    $(this).attr('danger_time',attr-1);
 		}
 	});

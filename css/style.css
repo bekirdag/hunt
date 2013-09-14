@@ -47,6 +47,16 @@ body,#canvas{
 	width:120px;
 }
 
+#info_box{
+	border:1px solid #6275F0;
+	padding:10px;
+	position: absolute;
+	top: 20px; 
+	right: 20px;
+/*	cursor:pointer;*/
+	width:120px;
+}
+
 .red{
 	background: red !important;
 }
@@ -55,4 +65,7 @@ body,#canvas{
 	background: blue !important;
 }
 
+.oldest{
+	border:3px solid black;
+}
 
