@@ -26,7 +26,7 @@ function rand_id(type)
 	}
 }
 
-function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold)
+function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate)
 {
 	var types = ["hunter","prey"];
 	var ran_num = Math.floor((Math.random()*100)+0);
@@ -38,6 +38,8 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold
 	var ran_y = Math.floor((Math.random()*window_h)+0);
 	var ran_energy = Math.floor((Math.random()*100)+10);
 	var ran_threshold = Math.floor((Math.random()*100)+10);
+	var ran_danger_time = Math.floor((Math.random()*10)+0);
+	var ran_linger_rate = Math.floor((Math.random()*100)+0);
 	var ran_color = get_random_color;
 	type = (typeof type === 'undefined') ? ran_type : type;
 	speed = (typeof speed === 'undefined') ? ran_speed : speed;
@@ -49,10 +51,12 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold
 	family = (typeof family === 'undefined') ? type : family;
 	energy = (typeof energy === 'undefined') ? ran_energy : energy;
 	threshold = (typeof threshold === 'undefined') ? ran_threshold : threshold;
+	danger_time = (typeof danger_time === 'undefined') ? ran_danger_time : danger_time;
+	linger_rate = (typeof linger_rate === 'undefined') ? ran_linger_rate : linger_rate;
 	border_radius = (type=="hunter") ? 3 : 10;
 	var ran_id = rand_id(type);
-	var prey_attr = (type=="prey") ? " mode='safe' danger_time='0' " : "";
-	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
+	var prey_attr = (type=="prey") ? " mode='safe' danger_time='"+danger_time+"' " : "";
+	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' linger_rate='"+linger_rate+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
 	var item = $("#"+ran_id);
 	item.css("background-color",color);
 	item.css("position","absolute");
@@ -132,12 +136,12 @@ function check_predator(me,run_from)
 		{
 			new_position = get_position(me,$(this).attr("id"),"run");
 			var me_o = $("#"+me);
-			if(new_position.distance<=me_o.width()*10)
+			if(new_position.distance<=me_o.width()*me_o.attr("danger_distance"))
 			{
 				// console.log("danger!");
 				me_o.attr("mode","danger");
-				me_o.attr("danger_time",2);
-				me_o.css("background-color","red");
+				me_o.attr("danger_time",me_o.attr("danger_distance"));
+				me_o.addClass("red");
 			}
 			else
 			{
@@ -145,7 +149,7 @@ function check_predator(me,run_from)
 				{
 					me_o.attr("mode","safe");
 					me_o.attr("danger_time",0);
-					me_o.css("background-color","blue");
+					me_o.removeClass("blue");
 				}
 			}
 		}
@@ -455,6 +459,7 @@ function tag(me,from,action) {
 	from_string = from;
 	from = from.split(",");
 	var saw = seeing(me,from,action);
+	var me_o = $("#"+me);
 	if(saw)
 	{
 		var pos = saw.items;
@@ -472,7 +477,7 @@ function tag(me,from,action) {
 		for (var i=0; i < pos.length; i++) {
 			percent = pos[i].weight/total_we;
 			// console.log(percent);
-			if(percent>0.7)
+			if(percent>me_o.attr("linger_rate")/100)
 			{
 				posx = pos[i].x;
 				posy = pos[i].y;
