@@ -40,6 +40,7 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold
 	var ran_threshold = Math.floor((Math.random()*100)+10);
 	var ran_danger_time = Math.floor((Math.random()*10)+0);
 	var ran_linger_rate = Math.floor((Math.random()*100)+0);
+	var ran_danger_distance = Math.floor((Math.random()*20)+0);
 	var ran_color = get_random_color;
 	type = (typeof type === 'undefined') ? ran_type : type;
 	speed = (typeof speed === 'undefined') ? ran_speed : speed;
@@ -53,10 +54,11 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold
 	threshold = (typeof threshold === 'undefined') ? ran_threshold : threshold;
 	danger_time = (typeof danger_time === 'undefined') ? ran_danger_time : danger_time;
 	linger_rate = (typeof linger_rate === 'undefined') ? ran_linger_rate : linger_rate;
+	danger_distance = (typeof danger_distance === 'undefined') ? ran_danger_distance : danger_distance;
 	border_radius = (type=="hunter") ? 3 : 10;
 	var ran_id = rand_id(type);
 	var prey_attr = (type=="prey") ? " mode='safe' danger_time='"+danger_time+"' " : "";
-	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' linger_rate='"+linger_rate+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
+	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' danger_distance='"+danger_distance+"' linger_rate='"+linger_rate+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
 	var item = $("#"+ran_id);
 	item.css("background-color",color);
 	item.css("position","absolute");
@@ -141,7 +143,8 @@ function check_predator(me,run_from)
 				// console.log("danger!");
 				me_o.attr("mode","danger");
 				me_o.attr("danger_time",me_o.attr("danger_distance"));
-				me_o.addClass("red");
+				me_o.css("background-color","red");
+				// me_o.addClass("red");
 			}
 			else
 			{
@@ -149,7 +152,8 @@ function check_predator(me,run_from)
 				{
 					me_o.attr("mode","safe");
 					me_o.attr("danger_time",0);
-					me_o.removeClass("blue");
+					// me_o.removeClass("red");
+					me_o.css("background-color","blue");
 				}
 			}
 		}

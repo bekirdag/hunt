@@ -48,11 +48,11 @@ body,#canvas{
 }
 
 .red{
-	background: red;
+	background: red !important;
 }
 
 .blue{
-	background: blue;
+	background: blue !important;
 }
 
 
