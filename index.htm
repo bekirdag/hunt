@@ -2,33 +2,50 @@
 <html lang="en-EN">
 <head>
 	<meta charset="UTF-8">
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.js"></script>
-	<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<script src="js/jquery.js"></script>
+	<script src="js/jquery-ui.js"></script>
 	<script src="js/creature.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 	<script type="text/javascript">
+		var animal_size = 20;
+		var plant_size = 40;
+		function create_animals()
+		{
+			var animal_number = $(".hunter").size() + $(".prey").size();
+			var left = animal_size - animal_number;
+			for(var i=0;i<left;i++)
+			{
+				if($(".hunter").size()>=animal_size/3)
+				{
+					create_item("prey");
+				}
+				else
+				{
+					create_item("hunter");
+				}
+				
+			}
+			setTimeout("create_animals()",3000);
+		}
+		
+		function create_plants()
+		{
+			var plant_number = $(".food").size();
+			var left = plant_size - plant_number;
+			for(var i=0;i<left;i++)
+			{
+				create_item("food",0,0);
+			}
+			setTimeout("create_plants()",3000);
+		}
+	
 		$(document).ready(function(){
-			// Start animation, set who is going to follow who, who will run away (from who) etc.
 			$("#start").click(function(){
-				
-				// var hunter = document.getElementById("hunter");
-				// hunter.addEventListener("load", follow('hunter','prey'));
-				
-				tag('hunter','prey,prey2,prey3,prey4','get_closer');
-				tag('hunter2','prey,prey2,prey3,prey4','get_closer');
-				tag('hunter3','prey,prey2,prey3,prey4','get_closer');
-				tag('hunter4','prey,prey2,prey3,prey4','get_closer');
-				tag('hunter5','prey,prey2,prey3,prey4','get_closer');
-				tag('hunter6','prey,prey2,prey3,prey4','get_closer');
-				tag('hunter7','prey,prey2,prey3,prey4','get_closer');
-				tag('hunter8','prey,prey2,prey3,prey4','get_closer');
+				create_animals();
+				create_plants();
 
-				tag('prey','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
-				tag('prey2','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
-				tag('prey3','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
-				tag('prey4','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
-				// tag('prey5','hunter,hunter2,hunter3,hunter4,hunter5,hunter6,hunter7,hunter8','run');
 				$(this).hide();
+				kill_slowly();
 			});
 
 			$(".org").draggable();
@@ -37,21 +54,7 @@
 	</script>
 </head>
 <body>
-	<section id="canvas">
-		<div id="hunter" speed="10" class="org" eyesightfactor="30"></div>
-		<div id="hunter2" speed="12" class="org" eyesightfactor="30"></div>
-		<div id="hunter3" speed="13" class="org" eyesightfactor="30"></div>
-		<div id="hunter4" speed="10" class="org" eyesightfactor="30"></div>
-		<div id="hunter5" speed="8" class="org" eyesightfactor="30"></div>
-		<div id="hunter6" speed="9" class="org" eyesightfactor="35"></div>
-		<div id="hunter7" speed="14" class="org" eyesightfactor="35"></div>
-		<div id="hunter8" speed="10" class="org" eyesightfactor="30"></div>
-		<div id="prey" speed="20" class="org" eyesightfactor="30"></div>
-		<div id="prey2" speed="20" class="org" eyesightfactor="30"></div>
-		<div id="prey3" speed="25" class="org" eyesightfactor="32"></div>
-		<div id="prey4" speed="24" class="org" eyesightfactor="33"></div>
-		<!-- <div id="prey5" speed="28" class="org" eyesightfactor="71"></div> -->
-	</section>
+	<section id="canvas"></section>
 	<div id="start">Click to start</div>
 </body>
 </html>

@@ -6,6 +6,37 @@ body,#canvas{
 	font-size:12px;
 }
 
+.hunter {
+	position: absolute;
+	width: 20px; 
+	height: 20px;
+	top: 150px; 
+	left: 1000px;
+	background: #ff0000;
+	border-radius: 3px;
+	-webkit-backface-visibility:hidden;
+}
+
+.prey {
+	position: absolute;
+	width: 20px; 
+	height: 20px;
+	top: 140px; 
+	left: 600px;
+	background: #B2BA16;
+	border-radius: 10px;
+	-webkit-backface-visibility:hidden;
+}
+
+.food {
+	position: absolute;
+	width: 10px; 
+	height: 10px;
+	background: green;
+	border-radius: 3px;
+	-webkit-backface-visibility:hidden;
+}
+
 #start{
 	border:1px solid #6275F0;
 	padding:10px;
@@ -27,8 +58,10 @@ body,#canvas{
 
 #hunter2 {
 	position: absolute;
-	width: 20px; height: 20px;
-	top: 150px; left: 1000px;
+	width: 20px; 
+	height: 20px;
+	top: 150px; 
+	left: 1000px;
 	background: #ff0000;
 	border-radius: 3px;
 	-webkit-backface-visibility:hidden;
@@ -86,16 +119,6 @@ body,#canvas{
 	background: pink;
 	border-radius: 3px;
 	-webkit-backface-visibility:hidden;
-}
-
-#prey,#prey2,#prey3,#prey4,#prey5 {
-	position: absolute;
-	width: 20px; height: 20px;
-	top: 140px; left: 600px;
-	background: black;
-	border-radius: 10px;
-	-webkit-backface-visibility:hidden;
-/*	border:2px solid #aaa;*/
 }
 
 #prey2{
