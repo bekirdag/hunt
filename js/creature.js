@@ -26,7 +26,7 @@ function rand_id(type)
 	}
 }
 
-function create_item(type,speed,eyesightfactor,x,y,color,family,energy)
+function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold)
 {
 	var types = ["hunter","prey"];
 	var ran_num = Math.floor((Math.random()*100)+0);
@@ -37,6 +37,7 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy)
 	var ran_x = Math.floor((Math.random()*window_w)+0);
 	var ran_y = Math.floor((Math.random()*window_h)+0);
 	var ran_energy = Math.floor((Math.random()*100)+10);
+	var ran_threshold = Math.floor((Math.random()*100)+10);
 	var ran_color = get_random_color;
 	type = (typeof type === 'undefined') ? ran_type : type;
 	speed = (typeof speed === 'undefined') ? ran_speed : speed;
@@ -47,10 +48,11 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy)
 	color = (type=="food") ? "green" : color;
 	family = (typeof family === 'undefined') ? type : family;
 	energy = (typeof energy === 'undefined') ? ran_energy : energy;
+	threshold = (typeof threshold === 'undefined') ? ran_threshold : threshold;
 	border_radius = (type=="hunter") ? 3 : 10;
 	var ran_id = rand_id(type);
 	var prey_attr = (type=="prey") ? " mode='safe' danger_time='0' " : "";
-	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
+	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
 	var item = $("#"+ran_id);
 	item.css("background-color",color);
 	item.css("position","absolute");
@@ -76,7 +78,7 @@ function creature_start(id)
 	{
 		var type = "food";
 	}
-	var threshold = 50;	
+	var threshold = item.attr("threshold");	
 	if(type=="prey" || type=="hunter")
 	{
 		keep_going(type,id,threshold);
