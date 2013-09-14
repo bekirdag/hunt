@@ -33,14 +33,13 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy)
 	ran_num = (ran_num>50) ? 1 : 0;
 	var ran_type = types[ran_num];
 	var ran_speed = Math.floor((Math.random()*50)+30);
-	var ran_eyesightfactor = Math.floor((Math.random()*40)+10);
+	var ran_eyesightfactor = Math.floor((Math.random()*50)+10);
 	var ran_x = Math.floor((Math.random()*window_w)+0);
 	var ran_y = Math.floor((Math.random()*window_h)+0);
 	var ran_energy = Math.floor((Math.random()*100)+10);
 	var ran_color = get_random_color;
 	type = (typeof type === 'undefined') ? ran_type : type;
 	speed = (typeof speed === 'undefined') ? ran_speed : speed;
-	speed = (type=="hunter") ? speed : speed*2;
 	eyesightfactor = (typeof eyesightfactor === 'undefined') ? ran_eyesightfactor : eyesightfactor;
 	x = (typeof x === 'undefined') ? ran_x : x;
 	y = (typeof y === 'undefined') ? ran_y : y;
@@ -50,7 +49,8 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy)
 	energy = (typeof energy === 'undefined') ? ran_energy : energy;
 	border_radius = (type=="hunter") ? 3 : 10;
 	var ran_id = rand_id(type);
-	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
+	var prey_attr = (type=="prey") ? " mode='safe' danger_time='0' " : "";
+	$("#canvas").append("<div id='"+ran_id+"' type='"+type+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
 	var item = $("#"+ran_id);
 	item.css("background-color",color);
 	item.css("position","absolute");
@@ -77,75 +77,113 @@ function creature_start(id)
 		var type = "food";
 	}
 	var threshold = 50;	
-	keep_going(type,item,id);
-	energy_control(id,type,threshold);
+	if(type=="prey" || type=="hunter")
+	{
+		keep_going(type,id,threshold);
+	}
 }
 
-function energy_control(id,type,threshold)
+function keep_going(type,id,threshold)
 {
-	var energy_control = energy_level(id);
-	if(energy_control<threshold)
+	// if it is a prey, always run away from the hunter
+	var energy = energy_control(id,type,threshold);
+	if(energy)
 	{
 		if(type=="hunter")
 		{
-			go_hunting(id,threshold,"prey","get_closer");
+			var timer = tag(id,".prey","catch");
 		}
 		else if(type=="prey")
 		{
-			go_hunting(id,threshold,"food","get_closer");
+			var me_o = $("#"+id);
+			check_predator(id,"hunter");
+			if(me_o.attr("mode")=="danger" || me_o.attr("danger_time")>0){
+				var timer = tag(id,".hunter","run");
+			}
+			else if((me_o.attr("mode")=="safe" || me_o.attr("mode")=="hunt") && me_o.attr("danger_time")==0)
+			{
+				me_o.attr("mode")=="hunt"
+				var timer = tag(id,".food","catch");
+			}
 		}
 	}
-	clearTimeout(timers["energy_control"+id]);
-	timers["energy_control"+id] = setTimeout("energy_control('"+id+"','"+type+"','"+threshold+"')",3000);
+	else
+	{
+		if(type=="prey"){
+			var timer = tag(id,".hunter","run");
+		}
+	}
+	// clearTimeout(timers["keep_going"+id]);
+	timers["keep_going"+id] = setTimeout("keep_going('"+type+"','"+id+"','"+threshold+"')",timer);
 }
 
-function keep_going(type,item,id)
+function check_predator(me,run_from)
 {
-	// if it is a prey, always run away from the hunter
-	if(type=="prey")
-	{
-		var prey = tag(id,".hunter","run");
-		clearTimeout(timers["keep_going"+id]);
-		timers["keep_going"+id] = setTimeout("keep_going('"+type+"','"+item+"','"+id+"')",prey);
-	}
+	var me_o = $("#"+me);
+	var danger_time = me_o.attr('danger_time');
+	var mode = me_o.attr('mode');
+	
+	var h_el = $("."+run_from);
+	h_el.each(function(){
+		var eyesight = get_saw(me,$(this).attr("id"));
+		if(eyesight) 
+		{
+			new_position = get_position(me,$(this).attr("id"),"run");
+			var me_o = $("#"+me);
+			if(new_position.distance<=me_o.width()*10)
+			{
+				// console.log("danger!");
+				me_o.attr("mode","danger");
+				me_o.attr("danger_time",2);
+				me_o.css("background-color","red");
+			}
+			else
+			{
+				if(typeof danger_time == 'undefined' || danger_time == false || danger_time==0)
+				{
+					me_o.attr("mode","safe");
+					me_o.attr("danger_time",0);
+					me_o.css("background-color","blue");
+				}
+			}
+		}
+	});
 }
 
 function kill_slowly()
 {
 	$(".org").each(function(){
 		energy_change($(this).attr("id"),-1);
+		
+		//reduce danger times
+		var attr = $(this).attr('danger_time');
+		var mode = $(this).attr('mode');
+
+		if (attr>0) {
+			console.log(attr);
+		    $(this).attr('danger_time',attr-1);
+		}
 	});
 	setTimeout("kill_slowly()",1000);
 }
 
-function go_hunting(id,threshold,what,action)
-{
-	if(id.length>0)
-	{
-		var hunt = tag(id,"."+what,action);
-		var me_o = $("#"+id);
-		var my_energy = parseInt(me_o.attr("energy"));
-		
-		
 
-		if(my_energy<threshold && my_energy>0)
-		{
-			if(what == "food" && me_o.attr("danger")=="danger"){
-				console.log("danger!");
-				return false;
-			}
-			clearTimeout(timers["go_hunting"+id]);
-			timers["go_hunting"+id]  = setTimeout("go_hunting('"+id+"','"+threshold+"','"+what+"','"+action+"')",hunt);
-		}
-		else if(my_energy>threshold)
-		{
-			// console.log(id + " is full");
-			clearTimeout(timers["go_hunting"+id]);
-		}
-		else if(my_energy<0)
-		{
-			me_o.remove();
-		}
+function energy_control(id,type,threshold)
+{
+	var energy_control = energy_level(id);
+	if(energy_control>threshold)
+	{
+		return false;
+	}
+	else if(energy_control<threshold && energy_control>0)
+	{
+		return true;
+	}
+	else if(energy_control<0)
+	{
+		var me_o = $("#"+id);
+		me_o.remove();
+		return true;
 	}
 }
 
@@ -257,7 +295,7 @@ function get_position(me,him,action) {
 
 	    var distance = Math.sqrt(Math.pow(x2,2) + Math.pow(y2,2));
 
-		var factor = (action=="get_closer") ? 1 : -1;
+		var factor = (action=="catch") ? 1 : -1;
 
 		var x1 = abs_x2/Math.sqrt(Math.pow(abs_x2,2)+Math.pow(abs_y2,2));
 		var y1 = x1*abs_y2/abs_x2;
@@ -327,7 +365,7 @@ function get_saw(me,him)
 		x2 = (x2_alt<abs_x2) ? x2_alt : abs_x2;
 		y2 = (y2_alt<abs_y2) ? y2_alt : abs_y2;
 
-		var eyesight = me_el.attr("eyesightfactor") * (me_el.width() + me_el.height())/4;
+		var eyesight = me_el.attr("eyesightfactor") * (me_el.width() + me_el.height())/5;
 
 		var distance = Math.sqrt(Math.pow(x2,2) + Math.pow(y2,2));
 
@@ -358,15 +396,6 @@ function seeing(me,him,action) {
 					pos[seeing]= {x:new_position.x,y:new_position.y,distance:new_position.distance,weight:0,element:$(this).attr("id")};
 					total_distance += new_position.distance;
 					seeing++;
-					var me_o = $("#"+me);
-					if(new_position.distance<=me_o.width()*5)
-					{
-						me_o.attr("danger","danger");
-					}
-					else
-					{
-						me_o.attr("danger","safe");
-					}
 				}
 			});
 		}
@@ -379,15 +408,6 @@ function seeing(me,him,action) {
 				pos[seeing]= {x:new_position.x,y:new_position.y,distance:new_position.distance,weight:0,element:items[i]};
 				total_distance += new_position.distance;
 				seeing++;
-				var me_o = $("#"+me);
-				if(new_position.distance<=me_o.width()*5)
-				{
-					me_o.attr("danger","danger");
-				}
-				else
-				{
-					me_o.attr("danger","safe");
-				}
 			}
 		}
 	}
@@ -406,7 +426,7 @@ function seeing(me,him,action) {
 
 function patrol(me){
 	// console.log("patrolling-->" + me);
-	// get_position(me,"imaginary","get_closer");
+	// get_position(me,"imaginary","catch");
 }
 
 function touch(me,to,distance)
@@ -468,7 +488,7 @@ function tag(me,from,action) {
 	}
 	else
 	{
-		patrol(me);
+		// patrol(me);
 		var timer = 1000;
 	}
 	
