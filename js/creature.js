@@ -26,7 +26,7 @@ function rand_id(type)
 	}
 }
 
-function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate)
+function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate,danger_distance,danger_time)
 {
 	var types = ["hunter","prey"];
 	var ran_num = Math.floor((Math.random()*100)+0);
@@ -91,7 +91,18 @@ function creature_start(id)
 	}
 	$(".org").draggable();
 	$("#"+id).click(function(){
-		$("#oldest").text("Age: " + $(this).attr("age"));
+		var item_html = "<ul>\
+			<li>Age: "+$(this).attr("age")+"</li>\
+			<li>Speed: "+$(this).attr("speed")+"</li>\
+			<li>Danger distance: "+$(this).attr("danger_distance")+"</li>\
+			<li>Linger rate: "+$(this).attr("linger_rate")+"</li>\
+			<li>Threshold: "+$(this).attr("threshold")+"</li>\
+			<li>Eyesightfactor: "+$(this).attr("eyesightfactor")+"</li>\
+			<li>Energy: "+$(this).attr("energy")+"</li>\
+			<li>Danger time: "+$(this).attr("danger_time")+"</li>\
+			<li>Mode: "+$(this).attr("mode")+"</li>\
+		</ul>";
+		$("#oldest").html(item_html);
 	});
 }
 
