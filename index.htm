@@ -11,11 +11,14 @@
 		var plant_size = 40;
 		function create_animals()
 		{
+			mark_oldest("hunter");
+			mark_oldest("prey");
 			var animal_number = $(".hunter").size() + $(".prey").size();
 			var left = animal_size - animal_number;
 			for(var i=0;i<left;i++)
 			{
-				if($(".hunter").size()>=animal_size/3)
+			
+				if($(".hunter").size()>=animal_size/4)
 				{
 					create_item("prey");
 				}

@@ -63,12 +63,24 @@ ul{
 	padding:0 0 0 10px;
 }
 
-.red{
+.danger{
 	background: red !important;
 }
 
-.blue{
+.hunt{
 	background: blue !important;
+}
+
+.sex{
+	background: #F799B9 !important;
+}
+
+.patrol{
+	background: orange !important;
+}
+
+.sleep{
+/*	background: gray !important;*/
 }
 
 .oldest{

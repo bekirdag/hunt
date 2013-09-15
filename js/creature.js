@@ -26,40 +26,67 @@ function rand_id(type)
 	}
 }
 
-function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate,danger_distance,danger_time)
+function mark_oldest(type)
+{
+	var max_age = 0;
+	var id = "";
+	$("."+type).each(function(){
+		$(this).removeClass("oldest");
+		max_age = (parseInt($(this).attr("age"))>=max_age) ? $(this).attr("age") : max_age;
+		id = ($(this).attr("age")>max_age) ? $(this).attr("id") : id;
+	});
+	$("#"+id).addClass("oldest");
+	return id;
+}
+
+function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate,danger_distance,danger_time,gender,store,store_using_threshold,sex_desire,sex_threshold)
 {
 	var types = ["hunter","prey"];
 	var ran_num = Math.floor((Math.random()*100)+0);
 	ran_num = (ran_num>50) ? 1 : 0;
 	var ran_type = types[ran_num];
-	var ran_speed = Math.floor((Math.random()*50)+30);
+	var ran_speed = Math.floor((Math.random()*50)+0);
 	var ran_eyesightfactor = Math.floor((Math.random()*50)+10);
 	var ran_x = Math.floor((Math.random()*window_w)+0);
 	var ran_y = Math.floor((Math.random()*window_h)+0);
 	var ran_energy = Math.floor((Math.random()*100)+10);
-	var ran_threshold = Math.floor((Math.random()*100)+10);
-	var ran_danger_time = Math.floor((Math.random()*10)+0);
+	var ran_threshold = Math.floor((Math.random()*100)+0);
+	var ran_danger_time = Math.floor((Math.random()*10)+1);
 	var ran_linger_rate = Math.floor((Math.random()*100)+0);
 	var ran_danger_distance = Math.floor((Math.random()*20)+0);
-	var ran_color = get_random_color;
+	var ran_gender = Math.floor((Math.random()*100)+0);
+	var ran_store = Math.floor((Math.random()*100)+0);
+	var ran_store_using_threshold = Math.floor((Math.random()*100)+0);
+	var sex_desire = Math.floor((Math.random()*100)+0);
+	var sex_threshold = Math.floor((Math.random()*100)+0);
+	ran_gender = (ran_gender>50) ? "m" : "f";
+	var ran_color = get_random_color();
 	type = (typeof type === 'undefined') ? ran_type : type;
 	speed = (typeof speed === 'undefined') ? ran_speed : speed;
 	eyesightfactor = (typeof eyesightfactor === 'undefined') ? ran_eyesightfactor : eyesightfactor;
 	x = (typeof x === 'undefined') ? ran_x : x;
 	y = (typeof y === 'undefined') ? ran_y : y;
 	color = (typeof color === 'undefined') ? ran_color : color;
-	color = (type=="food") ? "green" : color;
+	color = (type=="food") ? "#2AB811" : color;
 	family = (typeof family === 'undefined') ? type : family;
 	energy = (typeof energy === 'undefined') ? ran_energy : energy;
 	threshold = (typeof threshold === 'undefined') ? ran_threshold : threshold;
 	danger_time = (typeof danger_time === 'undefined') ? ran_danger_time : danger_time;
 	linger_rate = (typeof linger_rate === 'undefined') ? ran_linger_rate : linger_rate;
 	danger_distance = (typeof danger_distance === 'undefined') ? ran_danger_distance : danger_distance;
+	gender = (typeof gender === 'undefined') ? ran_gender : gender;
+	// store = (typeof store === 'undefined') ? ran_store : store;
+	store = 0;
+	store_using_threshold = (typeof store_using_threshold === 'undefined') ? ran_store_using_threshold : store_using_threshold;
+	sex_desire = (typeof sex_desire === 'undefined') ? ran_sex_desire : sex_desire;
+	sex_threshold = (typeof sex_threshold === 'undefined') ? ran_sex_threshold : sex_threshold;
 	border_radius = (type=="hunter") ? 3 : 10;
 	var ran_id = rand_id(type);
-	var prey_attr = (type=="prey") ? " mode='safe' danger_time='"+danger_time+"' " : "";
-	$("#canvas").append("<div id='"+ran_id+"' age='0' type='"+type+"' danger_distance='"+danger_distance+"' linger_rate='"+linger_rate+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
+	var danger_time_long = danger_time;
+	var prey_attr = (type=="prey") ? " danger_time='"+danger_time+"' danger_time_long='"+danger_time_long+"' " : "";
+	$("#canvas").append("<div mode='sleep' id='"+ran_id+"' age='0' type='"+type+"' color='"+color+"' sex_desire='"+sex_desire+"' sex_threshold='"+sex_threshold+"' store='"+store+"' store_using_threshold='"+store_using_threshold+"' gender='"+gender+"' danger_distance='"+danger_distance+"' linger_rate='"+linger_rate+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"'></div>");
 	var item = $("#"+ran_id);
+
 	item.css("background-color",color);
 	item.css("position","absolute");
 	item.css("left",x);
@@ -84,10 +111,10 @@ function creature_start(id)
 	{
 		var type = "food";
 	}
-	var threshold = item.attr("threshold");	
+
 	if(type=="prey" || type=="hunter")
 	{
-		keep_going(type,id,threshold);
+		keep_going(type,id);
 	}
 	$(".org").draggable();
 	$("#"+id).click(function(){
@@ -100,44 +127,96 @@ function creature_start(id)
 			<li>Eyesightfactor: "+$(this).attr("eyesightfactor")+"</li>\
 			<li>Energy: "+$(this).attr("energy")+"</li>\
 			<li>Danger time: "+$(this).attr("danger_time")+"</li>\
+			<li>Danger time long: "+$(this).attr("danger_time_long")+"</li>\
 			<li>Mode: "+$(this).attr("mode")+"</li>\
+			<li>Sex desire: "+$(this).attr("sex_desire")+"</li>\
+			<li>Sex threshold: "+$(this).attr("sex_threshold")+"</li>\
+			<li>Store: "+$(this).attr("store")+"</li>\
+			<li>Store using threshold: "+$(this).attr("store_using_threshold")+"</li>\
 		</ul>";
 		$("#oldest").html(item_html);
 	});
 }
 
-function keep_going(type,id,threshold)
+// modes:
+// hunt
+// sleep
+// have sex
+
+function keep_going(type,id)
 {
-	// if it is a prey, always run away from the hunter
-	var energy = energy_control(id,type,threshold);
+	var me_o = $("#"+id);
+	var energy = energy_control(id);
 	if(energy)
 	{
 		if(type=="hunter")
 		{
 			var timer = tag(id,".prey","catch");
+			me_o.attr("mode","hunt");
+			me_o.removeClass("danger hunt sex patrol sleep");
+			me_o.addClass("hunt");
 		}
 		else if(type=="prey")
 		{
-			var me_o = $("#"+id);
 			check_predator(id,"hunter");
 			if(me_o.attr("mode")=="danger" || me_o.attr("danger_time")>0){
 				var timer = tag(id,".hunter","run");
+				me_o.removeClass("danger hunt sex patrol sleep");
+				me_o.addClass("hunt");
 			}
-			else if((me_o.attr("mode")=="safe" || me_o.attr("mode")=="hunt") && me_o.attr("danger_time")==0)
+			else if(me_o.attr("danger_time")==0)
 			{
-				me_o.attr("mode")=="hunt"
+				me_o.attr("mode","hunt");
+				me_o.removeClass("danger hunt sex patrol sleep");
+				me_o.addClass("hunt");
 				var timer = tag(id,".food","catch");
 			}
 		}
 	}
 	else
 	{
-		if(type=="prey"){
-			var timer = tag(id,".hunter","run");
+		sex_threshold = me_o.attr("sex_threshold");
+		sex_desire = me_o.attr("sex_desire");
+		if(sex_desire>sex_threshold)
+		{
+			if(type=="hunter")
+			{
+				var timer = tag(id,".hunter","catch");
+				me_o.removeClass("danger hunt sex patrol sleep");
+				me_o.addClass("sex");
+				me_o.attr("mode","sex");
+			}
+			else if(type=="prey")
+			{
+				check_predator(id,"hunter");
+				if(me_o.attr("mode")=="danger" || me_o.attr("danger_time")>0){
+					var timer = tag(id,".hunter","run");
+				}
+				else if(me_o.attr("danger_time")==0)
+				{
+					me_o.attr("mode","sex");
+					me_o.removeClass("danger hunt sex patrol sleep");
+					me_o.addClass("sex");
+					var timer = tag(id,".prey","catch");
+				}
+			}
+		}
+		else
+		{
+			me_o.attr("mode","sleep");
+			me_o.removeClass("danger hunt sex patrol sleep");
+			me_o.addClass("sleep");
+			var timer = 2000;
+			if(type=="prey"){
+				check_predator(id,"hunter");
+				if(me_o.attr("mode")=="danger" || me_o.attr("danger_time")>0){
+					var timer = tag(id,".hunter","run");
+				}
+			}
 		}
 	}
 	// clearTimeout(timers["keep_going"+id]);
-	timers["keep_going"+id] = setTimeout("keep_going('"+type+"','"+id+"','"+threshold+"')",timer);
+	timers["keep_going"+id] = setTimeout("keep_going('"+type+"','"+id+"')",timer);
 }
 
 function check_predator(me,run_from)
@@ -155,21 +234,24 @@ function check_predator(me,run_from)
 			var me_o = $("#"+me);
 			if(new_position.distance<=me_o.width()*me_o.attr("danger_distance"))
 			{
-				// console.log("danger!");
 				me_o.attr("mode","danger");
-				me_o.attr("danger_time",me_o.attr("danger_distance"));
-				// me_o.css("background-color","red");
-				me_o.addClass("red");
+				me_o.attr("danger_time",me_o.attr("danger_time_long"));
+				me_o.removeClass("danger hunt sex patrol sleep");
+				me_o.addClass("danger");
 			}
 			else
 			{
-				if(typeof danger_time == 'undefined' || danger_time == false || danger_time==0)
-				{
-					me_o.attr("mode","safe");
-					me_o.attr("danger_time",0);
-					me_o.removeClass("red");
-					// me_o.css("background-color","blue");
-				}
+				me_o.removeClass("danger hunt sex patrol sleep");
+				me_o.addClass("sleep");
+				me_o.attr("mode","sleep");
+				// if(danger_time<1)
+				// {
+				// 	if(me_o.attr("mode")=="danger")
+				// 	{
+				// 		me_o.attr("mode","sleep");
+				// 		me_o.removeClass("danger");
+				// 	}
+				// }
 			}
 		}
 	});
@@ -180,37 +262,58 @@ function kill_slowly()
 	$(".org").each(function(){
 		energy_change($(this).attr("id"),-1);
 		
+		var item = $(this);
+		if(item.attr("mode") == "sleep" && item.attr("store")>0 && item.attr("store")>item.attr("store_using_threshold"))
+		{
+			var new_level = parseInt(item.attr("store"))-1;
+			item.attr("store", new_level);
+			
+			var new_level = parseInt(item.attr("energy"))+1;
+			item.attr("energy", new_level);
+		}
+		
 		var new_age = parseInt($(this).attr("age"))+1;
 		$(this).attr("age", new_age);
 		
 		//reduce danger times
-		var attr = $(this).attr('danger_time');
+		var danger_time = $(this).attr('danger_time');
+		var sex_desire = parseInt($(this).attr('sex_desire'));
 		var mode = $(this).attr('mode');
 
-		if (attr>0) {
+		if(sex_desire<100)
+		{
+			$(this).attr('sex_desire',sex_desire+1);
+		}
+		
+		if (danger_time>0) {
 			// console.log(attr);
-		    $(this).attr('danger_time',attr-1);
+		    $(this).attr('danger_time',danger_time-1);
+			
 		}
 	});
 	setTimeout("kill_slowly()",1000);
 }
 
 
-function energy_control(id,type,threshold)
+function energy_control(id)
 {
-	var energy_control = energy_level(id);
-	if(energy_control>threshold)
+	var item = $("#"+id);
+	var energy = parseInt(item.attr("energy"));
+	var store = parseInt(item.attr("store"));
+	var threshold = parseInt(item.attr("threshold"));
+	var store_using_threshold = parseInt(item.attr("store_using_threshold"));
+	
+	if((energy+store)>(threshold+store_using_threshold))
 	{
 		return false;
 	}
-	else if(energy_control<threshold && energy_control>0)
+	else if((energy+store)<(threshold+store_using_threshold) && energy>0)
 	{
 		return true;
 	}
-	else if(energy_control<0)
+	else if(energy<0)
 	{
-		var me_o = $("#"+id);
-		me_o.remove();
+		item.remove();
 		return true;
 	}
 }
@@ -218,23 +321,37 @@ function energy_control(id,type,threshold)
 function energy_change(id,num)
 {
 	var item = $("#"+id);
-	var new_level = parseInt(item.attr("energy"))+parseInt(num);
-	item.attr("energy", new_level);
-	if(new_level<=0)
+	if(item.attr("mode")=="sleep")
 	{
-		item.remove();
+		if(item.attr("store")>0 && item.attr("store")>item.attr("store_using_threshold"))
+		{
+			var new_level = parseInt(item.attr("store"))+parseInt(num);
+			item.attr("store", new_level);
+		}
+		else
+		{
+			var new_level = parseInt(item.attr("energy"))+parseInt(num);
+			item.attr("energy", new_level);
+			if(new_level<=0)
+			{
+				item.remove();
+			}
+		}
 	}
-}
-
-function energy_level(id)
-{
-	var item = $("#"+id);
-	return parseInt(item.attr("energy"));
+	else
+	{
+		var new_level = parseInt(item.attr("energy"))+parseInt(num);
+		item.attr("energy", new_level);
+		if(new_level<=0)
+		{
+			item.remove();
+		}
+	}
 }
 
 function go(me,x,y) {
 	me_o = document.getElementById(me);
-	var speed = me_o.getAttribute("speed");
+	var speed = me_o.getAttribute("speed")*(1/(parseInt(me_o.getAttribute("store")/100)+1));
 	var count = speed;
 	var in_edge_x = false;
 	var in_edge_y = false;
@@ -296,27 +413,31 @@ function get_position(me,him,action) {
 	{
 		var my_position = $("#"+me).position();
 
+		var my_speed = me_o.attr("speed");
+		var his_position = $("#"+him).position();
+
 		if(him=="imaginary")
 		{
 			var m_x = my_position.left-1;
 			var m_y = my_position.top-1;
-			var him = create_item("imaginary",0,0,m_x,m_y,"","",5);
+			var ran_x = Math.floor((Math.random()*window_w)+0);
+			var ran_y = Math.floor((Math.random()*window_h)+0);
+			
+			var x2 = my_position.left-ran_x;
+			var y2 = my_position.top-ran_y;
+			
 		}
-
-		him_o = $("#"+him);
-		if(him_o.length<=0)
+		else
 		{
-			return false;
+			him_o = $("#"+him);
+			if(him_o.length<=0)
+			{
+				return false;
+			}
+
+			var x2 = my_position.left-his_position.left;
+			var y2 = my_position.top-his_position.top;
 		}
-
-		var my_speed = me_o.attr("speed");
-		var his_speed = him_o.attr("speed");
-
-		var his_position = $("#"+him).position();
-
-
-		var x2 = my_position.left-his_position.left;
-		var y2 = my_position.top-his_position.top;
 
 		var abs_x2 = Math.abs(x2);
 		var abs_y2 = Math.abs(y2);
@@ -417,13 +538,16 @@ function seeing(me,him,action) {
 		{
 			var h_el = $(him);
 			h_el.each(function(){
-				var eyesight = get_saw(me,$(this).attr("id"));
-				if(eyesight) 
+				if($(this).attr("id")!==me)
 				{
-					new_position = get_position(me,$(this).attr("id"),action);
-					pos[seeing]= {x:new_position.x,y:new_position.y,distance:new_position.distance,weight:0,element:$(this).attr("id")};
-					total_distance += new_position.distance;
-					seeing++;
+					var eyesight = get_saw(me,$(this).attr("id"));
+					if(eyesight) 
+					{
+						new_position = get_position(me,$(this).attr("id"),action);
+						pos[seeing]= {x:new_position.x,y:new_position.y,distance:new_position.distance,weight:0,element:$(this).attr("id")};
+						total_distance += new_position.distance;
+						seeing++;
+					}
 				}
 			});
 		}
@@ -454,25 +578,103 @@ function seeing(me,him,action) {
 
 function patrol(me){
 	// console.log("patrolling-->" + me);
-	// get_position(me,"imaginary","catch");
+	var new_pos = get_position(me,"imaginary","catch");
+	go(me,new_pos.x,new_pos.y);
+}
+
+function rand_choose(me,to){
+	var ran_num = Math.floor((Math.random()*100)+0);
+	var item = (ran_num>50) ? me : to;
+	return item;
+}
+
+
+function cross_two(me,to)
+{
+	var me_o = $("#"+me);
+	var to_o = $("#"+to);
+	
+	var new_energy = parseInt(me_o.attr("energy"))-10;
+	me_o.attr("energy", new_energy);
+	
+	var new_energy = parseInt(to_o.attr("energy"))-10;
+	to_o.attr("energy", new_energy);
+	
+	var my_position = me_o.position();
+	
+	// var to_o = $("#"+to);
+	console.log("sex:"+me+"+"+to);
+	var animal_number = $(".hunter").size() + $(".prey").size();
+	var left = animal_size - animal_number;
+	if((me_o.attr("type") == "hunter" && $(".hunter").size()>=animal_size/3) || (me_o.attr("type") == "prey" && $(".prey").size()>=2*animal_size/3))
+	{
+		left = 0;
+	}
+	if(left>0)
+	{
+		type = $("#"+rand_choose(me,to)).attr("type");
+		speed = $("#"+rand_choose(me,to)).attr("speed");
+		eyesightfactor = $("#"+rand_choose(me,to)).attr("eyesightfactor");
+		x = my_position.left;
+		y = my_position.top;
+		color = $("#"+rand_choose(me,to)).attr("color");
+		family = $("#"+rand_choose(me,to)).attr("family");
+		energy = 100;
+		threshold = $("#"+rand_choose(me,to)).attr("threshold");
+		linger_rate = $("#"+rand_choose(me,to)).attr("linger_rate");
+		danger_distance = $("#"+rand_choose(me,to)).attr("danger_distance");
+		danger_time = $("#"+rand_choose(me,to)).attr("danger_time");
+		gender = $("#"+rand_choose(me,to)).attr("gender");
+		store = 0;
+		store_using_threshold = $("#"+rand_choose(me,to)).attr("store_using_threshold");
+		sex_desire = $("#"+rand_choose(me,to)).attr("sex_desire");
+		sex_threshold = $("#"+rand_choose(me,to)).attr("sex_threshold");
+		var id = create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate,danger_distance,danger_time,gender,store,store_using_threshold,sex_desire,sex_threshold);
+		console.log(id + " is born with color:" + color);
+	}
 }
 
 function touch(me,to,distance)
 {
 	var me_o = $("#"+me);
 	var to_o = $("#"+to);
+	var my_type = me_o.attr("type");
+	var his_type = to_o.attr("type");
 	
-	if((me_o.attr("type")=="hunter" && to_o.attr("type")=="prey") || (me_o.attr("type")=="prey" && to_o.attr("type")=="food"))
+	var to_w = to_o.width();
+	var to_h = to_o.height();
+	var hip = Math.sqrt(Math.pow(to_w,2)+Math.pow(to_h,2));
+	
+	if(distance<=hip)
 	{
-		var to_w = to_o.width();
-		var to_h = to_o.height();
-		var hip = Math.sqrt(Math.pow(to_w,2)+Math.pow(to_h,2));
-
-		if(distance<=hip)
+		if((my_type=="hunter" && his_type=="prey") || (my_type=="prey" && his_type=="food"))
 		{
-			me_o.attr("energy",parseInt(me_o.attr("energy"))+parseInt(to_o.attr("energy")/2));
+			var new_energy = parseInt(me_o.attr("energy"))+parseInt(to_o.attr("energy")/2);
+			if(new_energy>100)
+			{
+				me_o.attr("energy",100);
+				me_o.attr("store",new_energy-100);
+				me_o.attr("mode","sleep");
+				me_o.removeClass("blue");
+			}
+			else
+			{
+				me_o.attr("energy",new_energy);
+				me_o.attr("mode","sleep");
+				me_o.removeClass("blue");
+			}
+
 			to_o.remove();
 			console.log(me_o.attr("type") + " killed " + to_o.attr("type"));
+		}
+		else if (my_type == his_type)
+		{
+			me_o.attr("sex_desire",0);
+			to_o.attr("sex_desire",0);
+			me_o.removeClass("pink");
+			to_o.removeClass("pink");
+			cross_two(me,to);
+			me_o.attr("mode","sleep");
 		}
 	}
 }
@@ -484,9 +686,9 @@ function tag(me,from,action) {
 	var me_o = $("#"+me);
 	if(saw)
 	{
+		me_o.removeClass("patrol");
 		var pos = saw.items;
 		total_distance = saw.total_distance;
-
 		posx = 0;
 		posy = 0;
 		var total_we = 0;
@@ -513,14 +715,18 @@ function tag(me,from,action) {
 		};
 	
 		go(me,posx,posy);
-		var timer = 30;
+		var timer = 50;
 	}
 	else
 	{
-		// patrol(me);
+		me_o.removeClass("danger hunt sex patrol sleep");
+		me_o.addClass("patrol");
+		me_o.attr("mode","patrol");
+		patrol(me);
 		var timer = 1000;
 	}
 	
 	return timer;
 }
+
 
