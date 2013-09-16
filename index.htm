@@ -5,17 +5,16 @@
 	<script src="js/jquery.js"></script>
 	<script src="js/jquery-ui.js"></script>
 	<script src="js/creature.js"></script>
-	<script src="js/jquery.svg.js"></script>
-	<script src="js/jquery.svganim.pack.js"></script>
-	<script src="js/jquery.svgdom.pack.js"></script>
+	<script src="js/jquery.svg.min.js"></script>
+	<script src="js/jquery.svgdom.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 	<script type="text/javascript">
-		var animal_size = 50;
-		var plant_size = 80;
+		var animal_size = 30;
+		var plant_size = 60;
 		function create_animals()
 		{
-			mark_oldest("hunter");
-			mark_oldest("prey");
+			// mark_oldest("hunter");
+			// mark_oldest("prey");
 			var animal_number = $(".hunter").size() + $(".prey").size();
 			var left = animal_size - animal_number;
 			for(var i=0;i<left;i++)
@@ -31,7 +30,7 @@
 				}
 				
 			}
-			setTimeout("create_animals()",10000);
+			setTimeout("create_animals()",20000);
 		}
 		
 		function create_plants()
@@ -48,6 +47,8 @@
 		$(document).ready(function(){
 			
 			$('#canvas').svg();
+			$("#mark_oldest_hunter").hide();
+			$("#mark_oldest_prey").hide();
 			
 			$("#start").click(function(){
 				create_animals();
@@ -55,6 +56,15 @@
 
 				$(this).hide();
 				kill_slowly();
+				$("#mark_oldest_hunter").show();
+				$("#mark_oldest_prey").show();
+			});
+			
+			$("#mark_oldest_hunter").click(function(){
+				mark_oldest("hunter");
+			});
+			$("#mark_oldest_prey").click(function(){
+				mark_oldest("prey");
 			});
 		});
 	</script>
@@ -64,6 +74,8 @@
 		
 	</svg>
 	<div id="start">Click to start</div>
+	<div id="mark_oldest_hunter">Mark oldest hunter</div>
+	<div id="mark_oldest_prey">Mark oldest prey</div>
 	<div id="info_box">
 		<div id="oldest"></div>
 	</div>

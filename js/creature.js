@@ -27,21 +27,7 @@ function rand_id(type)
 	}
 }
 
-function mark_oldest(type)
-{
-	var max_age = 0;
-	var id = "";
-	$("."+type).each(function(){
-		$(this).removeClass("oldest");
-		var item = creatures[$(this).attr("id")];
-		max_age = (parseInt(item.age)>=max_age) ? item.age : max_age;
-		id = (item.age>max_age) ? $(this).attr("id") : id;
-	});
-	$("#"+id).addClass("oldest");
-	return id;
-}
-
-function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate,danger_distance,danger_time,gender,store,store_using_threshold,sex_desire,sex_threshold)
+function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate,danger_distance,danger_time,gender,store,store_using_threshold,sex_desire,sex_threshold,patrol_threshold)
 {
 	var types = ["hunter","prey"];
 	var ran_num = Math.floor((Math.random()*100)+0);
@@ -51,16 +37,20 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold
 	var ran_eyesightfactor = Math.floor((Math.random()*50)+10);
 	var ran_x = Math.floor((Math.random()*window_w)+0);
 	var ran_y = Math.floor((Math.random()*window_h)+0);
+	var patrolx = 0;
+	var patroly = 0;
+	var patrolset = "false";
 	var ran_energy = Math.floor((Math.random()*100)+10);
 	var ran_threshold = Math.floor((Math.random()*100)+0);
 	var ran_danger_time = Math.floor((Math.random()*10)+1);
 	var ran_linger_rate = Math.floor((Math.random()*100)+0);
 	var ran_danger_distance = Math.floor((Math.random()*20)+0);
 	var ran_gender = Math.floor((Math.random()*100)+0);
-	var ran_store = Math.floor((Math.random()*100)+0);
-	var ran_store_using_threshold = Math.floor((Math.random()*100)+0);
+	var ran_store = Math.floor((Math.random()*200)+0);
+	var ran_store_using_threshold = Math.floor((Math.random()*200)+0);
 	var sex_desire = Math.floor((Math.random()*100)+0);
 	var sex_threshold = Math.floor((Math.random()*100)+0);
+	var ran_patrol_threshold = Math.floor((Math.random()*ran_threshold)+0);
 	ran_gender = (ran_gender>50) ? "m" : "f";
 	var ran_color = get_random_color();
 	type = (typeof type === 'undefined') ? ran_type : type;
@@ -70,84 +60,134 @@ function create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold
 	y = (typeof y === 'undefined') ? ran_y : y;
 	color = (typeof color === 'undefined') ? ran_color : color;
 	color = (type=="food") ? "#2AB811" : color;
-	family = (typeof family === 'undefined') ? type : family;
+	family = (typeof family === 'undefined') ? color : family;
 	energy = (typeof energy === 'undefined') ? ran_energy : energy;
 	threshold = (typeof threshold === 'undefined') ? ran_threshold : threshold;
 	danger_time = (typeof danger_time === 'undefined') ? ran_danger_time : danger_time;
 	linger_rate = (typeof linger_rate === 'undefined') ? ran_linger_rate : linger_rate;
 	danger_distance = (typeof danger_distance === 'undefined') ? ran_danger_distance : danger_distance;
 	gender = (typeof gender === 'undefined') ? ran_gender : gender;
-	// store = (typeof store === 'undefined') ? ran_store : store;
 	store = 0;
 	store_using_threshold = (typeof store_using_threshold === 'undefined') ? ran_store_using_threshold : store_using_threshold;
 	sex_desire = (typeof sex_desire === 'undefined') ? ran_sex_desire : sex_desire;
 	sex_threshold = (typeof sex_threshold === 'undefined') ? ran_sex_threshold : sex_threshold;
+	patrol_threshold = (typeof patrol_threshold === 'undefined') ? ran_patrol_threshold : patrol_threshold;
 	border_radius = (type=="hunter") ? 3 : 10;
 	var ran_id = rand_id(type);
 	var danger_time_long = danger_time;
-	// var prey_attr = (type=="prey") ? " danger_time='"+danger_time+"' danger_time_long='"+danger_time_long+"' " : "";
 	var svg = $('#canvas').svg('get');
 
 	if(type=="hunter")
 	{
 		svg.rect(x, y, 20, 20,
-		{fill: color, id:ran_id, class: 'org '+ family});
+		{fill: color, id:ran_id, class: 'org '+ type});
 
 	}
 	else if(type=="prey")
 	{
 		svg.circle(x, y, 10, 
-			{fill: color, id:ran_id, class: 'org '+ family});
+			{fill: color, id:ran_id, class: 'org '+ type});
 	}
 	else if(type=="food")
 	{
 		svg.circle(x, y, 5, 
-			{fill: color, id:ran_id, class: 'org '+ family});
+			{fill: color, id:ran_id, class: 'org '+ type});
 	}	
-	creatures[ran_id] = {x:x, y:y, width:10, height: 10, r:10, fill: color, mode: 'sleep', id:ran_id, age:0, type:type, color:color, sex_desire:sex_desire, sex_threshold:sex_threshold, store:store, store_using_threshold:store_using_threshold, gender:gender, danger_distance:danger_distance, linger_rate:linger_rate, threshold:threshold, speed:speed, eyesightfactor:eyesightfactor, class: 'org '+ family, energy:energy, danger_time: danger_time, danger_time_long:danger_time_long};
+	creatures[ran_id] = {x:x, y:y, width:10, height: 10, r:10, fill: color, mode: 'sleep', id:ran_id, age:0, type:type, color:color, sex_desire:sex_desire, sex_threshold:sex_threshold, store:store, store_using_threshold:store_using_threshold, gender:gender, danger_distance:danger_distance, linger_rate:linger_rate, threshold:threshold, speed:speed, eyesightfactor:eyesightfactor, class: 'org '+ family, family:family, energy:energy, danger_time: danger_time, danger_time_long:danger_time_long, patrolx: patrolx, patroly:patroly, patrolset:patrolset, patrol_threshold:patrol_threshold};
 	
-	// $("#canvas").append("<"+shape+" "+px+"='"+x+"' "+py+"='"+y+"' "+w_h+" mode='sleep' id='"+ran_id+"' age='0' type='"+type+"' color='"+color+"' fill='"+color+"' sex_desire='"+sex_desire+"' sex_threshold='"+sex_threshold+"' store='"+store+"' store_using_threshold='"+store_using_threshold+"' gender='"+gender+"' danger_distance='"+danger_distance+"' linger_rate='"+linger_rate+"' threshold='"+threshold+"' "+prey_attr+" speed='"+speed+"' eyesightfactor='"+eyesightfactor+"' class='org "+family+"' energy='"+energy+"' />");
-	// var item = $("#"+ran_id);
-
-	// item.css("background-color",color);
-	// item.css("position","absolute");
-	// item.css("left",x);
-	// item.css("top",y);
-	// item.css("border-radius",border_radius);
 	creature_start(ran_id);
 	return ran_id;
 }
 
+function check_exists(id)
+{
+	if(creatures[id] == undefined){
+		// console.log(id);
+	   return true;
+	}
+	else
+	{
+		return true;
+	}
+}
+
 function creature_start(id)
 {
+	// console.log(creatures[id]);
+	if(!check_exists(id))
+	{
+		return false;
+	}
 	var my_cr = creatures[id];
 	var type = my_cr.type;
 
 	if(type=="prey" || type=="hunter")
 	{
 		keep_going(type,id);
+		$("#"+id).attr("stroke-width","3");
 	}
 	// $(".org").draggable();
 	$("#"+id).click(function(){
-		var my_cr = creatures[id];
-		var item_html = "<ul>\
-			<li>Age: "+my_cr.age+"</li>\
-			<li>Speed: "+my_cr.speed+"</li>\
-			<li>Danger distance: "+my_cr.danger_distance+"</li>\
-			<li>Linger rate: "+my_cr.linger_rate+"</li>\
-			<li>Threshold: "+my_cr.threshold+"</li>\
-			<li>Eyesightfactor: "+my_cr.eyesightfactor+"</li>\
-			<li>Energy: "+my_cr.energy+"</li>\
-			<li>Danger time: "+my_cr.danger_time+"</li>\
-			<li>Danger time long: "+my_cr.danger_time_long+"</li>\
-			<li>Mode: "+my_cr.mode+"</li>\
-			<li>Sex desire: "+my_cr.sex_desire+"</li>\
-			<li>Sex threshold: "+my_cr.sex_threshold+"</li>\
-			<li>Store: "+my_cr.store+"</li>\
-			<li>Store using threshold: "+my_cr.store_using_threshold+"</li>\
-		</ul>";
-		$("#oldest").html(item_html);
+		clearTimeout(timers["info_box"]);
+		info_box(id);
+		$(".org").attr("stroke-width",3);
+		$("#"+id).attr("stroke-width",10);
 	});
+}
+
+function mark_oldest(type)
+{
+	var max_age = 0;
+	var id = "";
+	$("."+type).each(function(){
+		var item = creatures[$(this).attr("id")];
+		
+		if(parseInt(item.age)>max_age)
+		{
+			max_age = parseInt(item.age);
+			id = $(this).attr("id");
+		}
+	});
+	if(id!=="")
+	{
+		$(".org").attr("stroke-width",3);
+		$("#"+id).attr("stroke-width",10);
+		clearTimeout(timers["info_box"]);
+		info_box(id);
+	}
+	
+	return id;
+}
+
+function info_box(id)
+{
+	if(!check_exists(id))
+	{
+		return false;
+	}
+	var my_cr = creatures[id];
+	var item_html = "<ul>\
+		<li>Age: "+my_cr.age+"</li>\
+		<li>Speed: "+my_cr.speed+"</li>\
+		<li>Danger distance: "+my_cr.danger_distance+"</li>\
+		<li>Linger rate: "+my_cr.linger_rate+"</li>\
+		<li>Threshold: "+my_cr.threshold+"</li>\
+		<li>Eyesightfactor: "+my_cr.eyesightfactor+"</li>\
+		<li>Energy: "+my_cr.energy+"</li>\
+		<li>Danger time: "+my_cr.danger_time+"</li>\
+		<li>Danger time long: "+my_cr.danger_time_long+"</li>\
+		<li>Mode: "+my_cr.mode+"</li>\
+		<li>Sex desire: "+my_cr.sex_desire+"</li>\
+		<li>Sex threshold: "+my_cr.sex_threshold+"</li>\
+		<li>Store: "+my_cr.store+"</li>\
+		<li>Store using threshold: "+my_cr.store_using_threshold+"</li>\
+		<li>Patrol: "+my_cr.patrolx+","+my_cr.patroly+"</li>\
+		<li>Patrolset: "+my_cr.patrolset+"</li>\
+		<li>Patrol threshold: "+my_cr.patrol_threshold+"</li>\
+		<li>Family: "+my_cr.family+"</li>\
+	</ul>";
+	$("#oldest").html(item_html);
+	timers["info_box"] = setTimeout("info_box('"+id+"')",1000);
 }
 
 // modes:
@@ -157,35 +197,32 @@ function creature_start(id)
 
 function keep_going(type,id)
 {
+	if(!check_exists(id))
+	{
+		return false;
+	}
 	var my_cr = creatures[id];
-	// var me_o = $("#"+id);
 	var energy = energy_control(id);
 	if(energy)
 	{
 		if(type=="hunter")
 		{
-			var timer = tag(id,".prey","catch");
 			creatures[id].mode = "hunt";
 			mode_color(id);
-			// my_cr.mode="hunt";
-			// me_o.removeClass("danger hunt sex patrol sleep");
-			// me_o.addClass("hunt");
+			
+			var timer = tag(id,".prey","catch");
 		}
 		else if(type=="prey")
 		{
 			check_predator(id,"hunter");
-			if(my_cr.mode=="danger" || my_cr.danger_time>0){
+			if(my_cr.danger_time>0){
 				var timer = tag(id,".hunter","run");
-				// me_o.removeClass("danger hunt sex patrol sleep");
-				// me_o.addClass("hunt");
 			}
 			else if(my_cr.danger_time==0)
 			{
 				creatures[id].mode = "hunt";
 				mode_color(id);
-				// my_cr.mode="hunt";
-				// me_o.removeClass("danger hunt sex patrol sleep");
-				// me_o.addClass("hunt");
+				
 				var timer = tag(id,".food","catch");
 			}
 		}
@@ -198,42 +235,41 @@ function keep_going(type,id)
 		{
 			if(type=="hunter")
 			{
-				var timer = tag(id,".hunter","catch");
-				// me_o.removeClass("danger hunt sex patrol sleep");
-				// me_o.addClass("sex");
-				// my_cr.mode="sex";
 				creatures[id].mode = "sex";
 				mode_color(id);
+				
+				var timer = tag(id,".hunter","catch");
 			}
 			else if(type=="prey")
 			{
 				check_predator(id,"hunter");
-				if(my_cr.mode=="danger" || my_cr.danger_time>0){
+				if(my_cr.danger_time>0){
 					var timer = tag(id,".hunter","run");
 				}
 				else if(my_cr.danger_time==0)
 				{
 					creatures[id].mode = "sex";
 					mode_color(id);
-					// my_cr.mode="sex";
-					// me_o.removeClass("danger hunt sex patrol sleep");
-					// me_o.addClass("sex");
+					
 					var timer = tag(id,".prey","catch");
 				}
 			}
 		}
 		else
 		{
-			creatures[id].mode = "sleep";
-			mode_color(id);
-			// my_cr.mode = "sleep";
-			// me_o.removeClass("danger hunt sex patrol sleep");
-			// me_o.addClass("sleep");
-			var timer = 500;
 			if(type=="prey"){
 				check_predator(id,"hunter");
-				if(my_cr.mode=="danger" || my_cr.danger_time>0){
+				if(my_cr.danger_time>0){
+					creatures[id].mode=="danger";
+					
 					var timer = tag(id,".hunter","run");
+				}
+				else if(my_cr.danger_time==0)
+				{
+					creatures[id].mode = "sleep";
+					mode_color(id);
+					
+					var timer = 1000;
 				}
 			}
 		}
@@ -244,6 +280,14 @@ function keep_going(type,id)
 
 function check_predator(me,run_from)
 {
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(!check_exists(run_from))
+	{
+		return false;
+	}
 	var my_cr = creatures[me];
 	// var me_o = $("#"+me);
 	var danger_time = my_cr.danger_time;
@@ -251,7 +295,8 @@ function check_predator(me,run_from)
 	
 	var h_el = $("."+run_from);
 	h_el.each(function(){
-
+	if($(this).length>0)
+	{
 		var eyesight = get_saw(me,$(this).attr("id"));
 
 		if(eyesight) 
@@ -263,34 +308,42 @@ function check_predator(me,run_from)
 			{
 				creatures[me].mode = "danger";
 				mode_color(me);
+
 				creatures[me].danger_time = my_cr.danger_time_long;
-				// me_o.removeClass("danger hunt sex patrol sleep");
-				// me_o.addClass("danger");
 			}
 			else
 			{
-				// me_o.removeClass("danger hunt sex patrol sleep");
-				// me_o.addClass("sleep");
-				creatures[me].mode="sleep";
-				mode_color(me);
-				// if(danger_time<1)
-				// {
-				// 	if(me_o.attr("mode")=="danger")
-				// 	{
-				// 		me_o.attr("mode","sleep");
-				// 		me_o.removeClass("danger");
-				// 	}
-				// }
+				if(creatures[me].danger_time<=0)
+				{
+					creatures[me].mode="sleep";
+					mode_color(me);
+
+				}
 			}
 		}
+	}
 	});
 }
 
 function kill_slowly()
 {
 	$(".org").each(function(){
-		var my_cr = creatures[$(this).attr("id")];
-		energy_change(my_cr.id,-1);
+		var this_id = $(this).attr("id");
+		var my_cr = creatures[this_id];
+		if(!check_exists(this_id))
+		{
+			return false;
+		}
+		var reduce = -1;
+		if(my_cr.mode=="danger" || my_cr.mode=="hunt")
+		{
+			reduce = -2;
+		}
+		if(my_cr.mode=="patrol")
+		{
+			reduce = -3;
+		}
+		energy_change(my_cr.id,reduce);
 		
 		var item = $(this);
 		if(my_cr.mode == "sleep" && my_cr.store>0 && my_cr.store>my_cr.store_using_threshold)
@@ -347,14 +400,13 @@ function mode_color(me)
 			var color = "pink";
 			break;
 	}
-	// $("#"+me).attr("fill",color);
+	$("#"+me).attr("stroke",color);
 }
 
 
 function energy_control(id)
 {
 	var my_cr = creatures[id];
-	// var item = $("#"+id);
 	var energy = parseInt(my_cr.energy);
 	var store = parseInt(my_cr.store);
 	var threshold = parseInt(my_cr.threshold);
@@ -368,16 +420,14 @@ function energy_control(id)
 	{
 		return true;
 	}
-	// else if(energy<0)
-	// {
-	// 	delete creatures[id];
-	// 	item.remove();
-	// 	return true;
-	// }
 }
 
 function energy_change(id,num)
 {
+	if(!check_exists(id))
+	{
+		return false;
+	}
 	var my_cr = creatures[id];
 
 	if(my_cr.mode=="sleep")
@@ -395,7 +445,10 @@ function energy_change(id,num)
 			{
 				delete creatures[id];
 				var item = $("#"+id);
+				clearTimeout(timers["keep_going"+id]);
 				item.remove();
+				// var svg_item = document.getElementById(id);
+				// svg_item.parentNode.removeChild(svg_item);
 			}
 		}
 	}
@@ -407,6 +460,9 @@ function energy_change(id,num)
 		{
 			delete creatures[id];
 			var item = $("#"+id);
+			// var svg_item = document.getElementById(id);
+			// svg_item.parentNode.removeChild(svg_item);
+			clearTimeout(timers["keep_going"+id]);
 			item.remove();
 		}
 	}
@@ -414,8 +470,12 @@ function energy_change(id,num)
 
 function go(me,x,y) {
 	var my_cr = creatures[me];
+	if(!check_exists(me))
+	{
+		return false;
+	}
 	var me_o = $("#"+me);
-	var speed = my_cr.speed*(1/(parseInt(my_cr.store/100)+1));
+	var speed = my_cr.speed*(1/(parseInt(my_cr.store/30)+1));
 	var count = speed;
 	var in_edge_x = false;
 	var in_edge_y = false;
@@ -439,6 +499,15 @@ function go(me,x,y) {
 		in_edge_y = true;
 	}
 
+	if(isNaN(x))
+	{
+		x = my_cr.x;
+	}
+	if(isNaN(y))
+	{
+		y = my_cr.y;
+	}
+
 	if(my_cr.type=="hunter")
 	{
 		me_o.attr("x",x);
@@ -452,45 +521,15 @@ function go(me,x,y) {
 
 	creatures[me].x = x;
 	creatures[me].y = y;
-
-	// var my_position = $("#"+me).position();
-	// if(in_edge_x)
-	// {
-	// 	me_o.style.left = x+"px";
-	// }
-	// else
-	// {
-	// 	var x_dif = my_x - x;
-	// 	var first_pos_x = my_x;
-	// 	
-	// 	for (var i=0; i < count; i++) {
-	// 		
-	// 		me_o.style.left = first_pos_x - x_dif/count * i + "px" ;
-	// 	};
-	// }
-	// 
-	// if(in_edge_y)
-	// {
-	// 	me_o.style.top = y+"px";
-	// }
-	// else
-	// {
-	// 	var y_dif = my_y - y;
-	// 	var first_pos_y = my_y;
-	// 	for (var i=0; i < count; i++) {
-	// 		me_o.style.top = first_pos_y - y_dif/count * i + "px" ;
-	// 	};
-	// }
 }
 
 function get_atts(me)
 {
+	if(!check_exists(me))
+	{
+		return false;
+	}
 	var my_cr = creatures[me];
-	// var me_o = $("#"+me);
-	// var my_x = (my_cr.type=="hunter") ? my_cr.x : my_cr.cx;
-	// var my_y = (my_cr.type=="hunter") ? my_cr.y : my_cr.cy;
-	// var my_w = (my_cr.type=="hunter") ? my_cr.width : parseInt(my_cr.r*2);
-	// var my_h = (my_cr.type=="hunter") ? my_cr.height : parseInt(my_cr.r*2);
 	
 	return {x:parseFloat(my_cr.x),y:parseFloat(my_cr.y),w:parseFloat(my_cr.width),h:parseFloat(my_cr.height)};
 }
@@ -498,25 +537,26 @@ function get_atts(me)
 function get_position(me,him,action) {
 	// him could be imaginary
 	var my_cr = creatures[me];
-	// var me_o = $("#"+me);
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(him!=="imaginary" && !check_exists(him)){
+	   return false;
+	}
 	var me_prop = get_atts(me);
-
-	// var my_position = $("#"+me).position();
 	var my_x = me_prop.x;
 	var my_y = me_prop.y;
 	
 	var my_speed = my_cr.speed;
-	// var his_position = $("#"+him).position();
 
 	if(him=="imaginary")
 	{
-		var m_x = my_x-100;
-		var m_y = my_y-100;
-		var ran_x = Math.floor((Math.random()*window_w)+0);
-		var ran_y = Math.floor((Math.random()*window_h)+0);
+		var m_x = my_cr.patrolx;
+		var m_y = my_cr.patroly;
 		
-		var x2 = my_x-ran_x;
-		var y2 = my_y-ran_y;
+		var x2 = my_x-m_x;
+		var y2 = my_y-m_y;
 		
 	}
 	else
@@ -581,9 +621,14 @@ function get_position(me,him,action) {
 
 function get_saw(me,him)
 {
-	// console.log(me + " and " + him);
-	// var him_o = $("#"+him);
-	// var me_o = $("#"+me);
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(!check_exists(him))
+	{
+		return false;
+	}
 	var my_cr = creatures[me];
 	var to_cr = creatures[him];
 
@@ -620,6 +665,14 @@ function get_saw(me,him)
 }
 
 function seeing(me,him,action) {
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(!check_exists(him))
+	{
+		return false;
+	}
 	var items = him;
 	var seeing = 0;
 	var pos = [];
@@ -631,7 +684,7 @@ function seeing(me,him,action) {
 		{
 			var h_el = $(him);
 			h_el.each(function(){
-				if($(this).attr("id")!==me)
+				if($(this).attr("id")!==me && $(this).length>0)
 				{
 					var eyesight = get_saw(me,$(this).attr("id"));
 					if(eyesight) 
@@ -670,45 +723,61 @@ function seeing(me,him,action) {
 }
 
 function patrol(me){
-	// console.log("patrolling-->" + me);
-	// var imaginary_creature = create_item("imaginary");
-	// var new_pos = get_position(me,"imaginary","catch");
-	
-	// var my_cr = creatures[me];
-	// var me_o = $("#"+me);
-	// var me_prop = get_atts(me);
-	// 
-	// // var my_position = $("#"+me).position();
-	// var my_x = me_prop.x;
-	// var my_y = me_prop.y;
-	// 
-	// var ran_x = Math.floor((Math.random()*window_w)+0);
-	// var ran_y = Math.floor((Math.random()*window_h)+0);
-	// 
-	// var x2 = my_x-ran_x;
-	// var y2 = my_y-ran_y;
-	// 
-	// var distance = Math.sqrt(Math.pow(x2,2) + Math.pow(y2,2));
-	// 
-	// for(var i=0;i<distance;i++)
-	// {
-	// 	go(me,x2*i/distance,y2*i/distance);
-	// }
+	var my_cr = creatures[me];
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(my_cr.patrolset=="false")
+	{
+		var patrolx = Math.floor((Math.random()*window_w)+0);
+		var patroly = Math.floor((Math.random()*window_h)+0);
+		creatures[me].patrolset = "true";
+		creatures[me].patrolx = patrolx;
+		creatures[me].patroly = patroly;
+	}
+	var data = get_position(me,"imaginary","catch");
+	// console.log(data.distance);
+	if(data.distance<10)
+	{
+		var patrolx = Math.floor((Math.random()*window_w)+0);
+		var patroly = Math.floor((Math.random()*window_h)+0);
+		creatures[me].patrolset = "true";
+		creatures[me].patrolx = patrolx;
+		creatures[me].patroly = patroly;
+	}
+	else
+	{
+		go(me,data.x,data.y);
+	}
 }
 
 function rand_choose(me,to){
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(!check_exists(to))
+	{
+		return false;
+	}
 	var ran_num = Math.floor((Math.random()*100)+0);
 	var item = (ran_num>50) ? me : to;
 	return item;
 }
 
-
 function cross_two(me,to)
 {
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(!check_exists(to))
+	{
+		return false;
+	}
 	var my_cr = creatures[me];
 	var to_cr = creatures[to];
-	// var me_o = $("#"+me);
-	// var to_o = $("#"+to);
 	
 	var new_energy = parseInt(my_cr.energy)-10;
 	creatures[me].energy = new_energy;
@@ -720,8 +789,6 @@ function cross_two(me,to)
 	var my_x = my_prop.x;
 	var my_y = my_prop.y;
 	
-	// var to_o = $("#"+to);
-	console.log("sex:"+me+"+"+to);
 	var animal_number = $(".hunter").size() + $(".prey").size();
 	var left = animal_size - animal_number;
 	if((my_cr.type == "hunter" && $(".hunter").size()>=animal_size/3) || (my_cr.type == "prey" && $(".prey").size()>=2*animal_size/3))
@@ -737,7 +804,7 @@ function cross_two(me,to)
 		y = my_y;
 		color = creatures[rand_choose(me,to)].color;
 		family = creatures[rand_choose(me,to)].family;
-		energy = 100;
+		energy = 150;
 		threshold = creatures[rand_choose(me,to)].threshold;
 		linger_rate = creatures[rand_choose(me,to)].linger_rate;
 		danger_distance = creatures[rand_choose(me,to)].danger_distance;
@@ -747,18 +814,24 @@ function cross_two(me,to)
 		store_using_threshold = creatures[rand_choose(me,to)].store_using_threshold;
 		sex_desire = creatures[rand_choose(me,to)].sex_desire;
 		sex_threshold = creatures[rand_choose(me,to)].sex_threshold;
-		var id = create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate,danger_distance,danger_time,gender,store,store_using_threshold,sex_desire,sex_threshold);
-		console.log(id + " is born with color:" + color);
+		patrol_threshold = creatures[rand_choose(me,to)].patrol_threshold;
+		var id = create_item(type,speed,eyesightfactor,x,y,color,family,energy,threshold,linger_rate,danger_distance,danger_time,gender,store,store_using_threshold,sex_desire,sex_threshold,patrol_threshold);
 	}
 }
 
 function touch(me,to,distance)
 {
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(!check_exists(to))
+	{
+		return false;
+	}
 	var my_cr = creatures[me];
 	var to_cr = creatures[to];
 	
-	// var me_o = $("#"+me);
-
 	var my_type = my_cr.type;
 	var his_type = to_cr.type;
 	
@@ -773,12 +846,10 @@ function touch(me,to,distance)
 		if((my_type=="hunter" && his_type=="prey") || (my_type=="prey" && his_type=="food"))
 		{
 			var new_energy = parseInt(my_cr.energy)+parseInt(to_cr.energy/2);
-			if(new_energy>100)
+			if(new_energy>200)
 			{
-				creatures[me].energy = 100;
-				creatures[me].store = new_energy-100;
-				// me_o.removeClass("danger hunt sex patrol sleep");
-				// me_o.addClass("sleep");
+				creatures[me].energy = 200;
+				creatures[me].store = new_energy-200;
 				creatures[me].mode = "sleep";
 				mode_color(me);
 			}
@@ -787,39 +858,43 @@ function touch(me,to,distance)
 				creatures[me].energy = new_energy;
 				creatures[me].mode = "sleep";
 				mode_color(me);
-				// me_o.removeClass("danger hunt sex patrol sleep");
-				// me_o.addClass("sleep");
+				
 			}
 			var to_o = $("#"+to);
+			clearTimeout(timers["keep_going"+to]);
 			to_o.remove();
-			console.log(my_type + " killed " + his_type);
+			// var svg_item = document.getElementById(to);
+			// svg_item.parentNode.removeChild(svg_item);
 		}
 		else if (my_type == his_type)
 		{
 			creatures[me].sex_desire = 0;
 			creatures[to].sex_desire = 0;
-			// me_o.removeClass("danger hunt sex patrol sleep");
-			// to_o.removeClass("danger hunt sex patrol sleep");
 			cross_two(me,to);
 			creatures[me].mode = "sleep";
 			mode_color(me);
 			mode_color(to);
 			creatures[to].mode = "sleep";
-			// me_o.addClass("sleep");
-			// to_o.addClass("sleep");
+			
 		}
 	}
 }
 
 function tag(me,from,action) {
+	if(!check_exists(me))
+	{
+		return false;
+	}
+	if(!check_exists(from))
+	{
+		return false;
+	}
 	var my_cr = creatures[me];
 	from_string = from;
 	from = from.split(",");
 	var saw = seeing(me,from,action);
-	// var me_o = $("#"+me);
 	if(saw)
 	{
-		// me_o.removeClass("patrol");
 		var pos = saw.items;
 		total_distance = saw.total_distance;
 		posx = 0;
@@ -828,12 +903,10 @@ function tag(me,from,action) {
 		for (var i=0; i < pos.length; i++) {
 			pos[i].weight = total_distance/pos[i].distance;
 			total_we += pos[i].weight;
-			// check if touches
 			touch(me,pos[i].element,pos[i].distance);
 		};
 		for (var i=0; i < pos.length; i++) {
 			percent = pos[i].weight/total_we;
-			// console.log(percent);
 			if(percent>my_cr.linger_rate/100)
 			{
 				posx = pos[i].x;
@@ -852,12 +925,21 @@ function tag(me,from,action) {
 	}
 	else
 	{
-		// me_o.removeClass("danger hunt sex patrol sleep");
-		// me_o.addClass("patrol");
-		creatures[me].mode = "sleep";
-		mode_color(me);
-		// patrol(me);
-		var timer = 1000;
+		if(creatures[me].mode == "hunt" || creatures[me].mode == "sex")
+		{
+			if(my_cr.energy<my_cr.patrol_threshold)
+			{
+				creatures[me].mode = "patrol";
+				patrol(me);
+				mode_color(me);
+			}
+			else
+			{
+				creatures[me].mode = "sleep";
+				mode_color(me);
+			}
+		}
+		var timer = 50;
 	}
 	
 	return timer;

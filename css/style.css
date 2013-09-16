@@ -37,7 +37,7 @@ body,#canvas{
 	-webkit-backface-visibility:hidden;
 }
 
-#start, #hide{
+#start, #mark_oldest_hunter, #mark_oldest_prey{
 	border:1px solid #6275F0;
 	padding:10px;
 	position: absolute;
@@ -45,6 +45,10 @@ body,#canvas{
 	left: 20px;
 	cursor:pointer;
 	width:120px;
+}
+
+#mark_oldest_prey{
+	top:60px;
 }
 
 #info_box{
