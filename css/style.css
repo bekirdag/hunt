@@ -37,7 +37,7 @@ body,#canvas{
 	-webkit-backface-visibility:hidden;
 }
 
-#start{
+#start, #hide{
 	border:1px solid #6275F0;
 	padding:10px;
 	position: absolute;
@@ -80,7 +80,7 @@ ul{
 }
 
 .sleep{
-/*	background: gray !important;*/
+	background: gray !important;
 }
 
 .oldest{

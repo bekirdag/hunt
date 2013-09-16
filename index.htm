@@ -5,10 +5,13 @@
 	<script src="js/jquery.js"></script>
 	<script src="js/jquery-ui.js"></script>
 	<script src="js/creature.js"></script>
+	<script src="js/jquery.svg.js"></script>
+	<script src="js/jquery.svganim.pack.js"></script>
+	<script src="js/jquery.svgdom.pack.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 	<script type="text/javascript">
-		var animal_size = 20;
-		var plant_size = 40;
+		var animal_size = 50;
+		var plant_size = 80;
 		function create_animals()
 		{
 			mark_oldest("hunter");
@@ -28,7 +31,7 @@
 				}
 				
 			}
-			setTimeout("create_animals()",3000);
+			setTimeout("create_animals()",10000);
 		}
 		
 		function create_plants()
@@ -43,6 +46,9 @@
 		}
 	
 		$(document).ready(function(){
+			
+			$('#canvas').svg();
+			
 			$("#start").click(function(){
 				create_animals();
 				create_plants();
@@ -54,7 +60,9 @@
 	</script>
 </head>
 <body>
-	<section id="canvas"></section>
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" id="canvas">
+		
+	</svg>
 	<div id="start">Click to start</div>
 	<div id="info_box">
 		<div id="oldest"></div>
