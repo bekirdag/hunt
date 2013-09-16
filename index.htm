@@ -10,42 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 	<script type="text/javascript">
 		var animal_size = 30;
-		var plant_size = 60;
-		function create_animals()
-		{
-			// mark_oldest("hunter");
-			// mark_oldest("prey");
-			var animal_number = $(".hunter").size() + $(".prey").size();
-			var left = animal_size - animal_number;
-			for(var i=0;i<left;i++)
-			{
-			
-				if($(".hunter").size()>=animal_size/4)
-				{
-					var obj = {type:"prey"};
-					create_item(obj);
-				}
-				else
-				{
-					var obj = {type:"hunter"};
-					create_item(obj);
-				}
-				
-			}
-			setTimeout("create_animals()",60000);
-		}
-		
-		function create_plants()
-		{
-			var plant_number = $(".food").size();
-			var left = plant_size - plant_number;
-			for(var i=0;i<left;i++)
-			{
-				var obj = {type:"food",speed:0,eyesightfactor:0};
-				create_item(obj);
-			}
-			setTimeout("create_plants()",15000);
-		}
+		var plant_size = 70;
 	
 		$(document).ready(function(){
 			

@@ -3,22 +3,24 @@ var window_h = $(window).height();
 var speed_factor = 0.2;
 var creatures = {};
 var timers = [];
+var total_creations = 0;
+var num_of_mutations = 0;
 var settings = {
 	x:window_w, 
 	y:window_h, 
 	sex_desire:100, 
 	sex_threshold:100, 
-	store:200, 
-	store_using_threshold:200, 
+	store:100, 
+	store_using_threshold:100, 
 	danger_distance:20, 
 	linger_rate:100, 
-	threshold:200, 
+	threshold:100, 
 	speed:50, 
 	eyesightfactor:50, 
-	energy:200, 
+	energy:100, 
 	danger_time: 10, 
-	patrol_threshold:200,
-	mutation_rate:0.001
+	patrol_threshold:100,
+	mutation_rate:0.01
 };
 
 function get_random_color() {
@@ -170,9 +172,12 @@ function mark_oldest(type)
 		$("#"+id).attr("stroke-width",10);
 		clearTimeout(timers["info_box"]);
 		info_box(id);
+		return id;
 	}
-	
-	return id;
+	else
+	{
+		return false;
+	}
 }
 
 function info_box(id)
@@ -834,14 +839,22 @@ function cross_two(me,to)
 		cr_data.sex_threshold = creatures[rand_choose(me,to)].sex_threshold;
 		cr_data.patrol_threshold = creatures[rand_choose(me,to)].patrol_threshold;
 		
-		var mutation = Math.floor((Math.random()*1000)+0);
-		if(mutation*settings.mutation_rate>=1)
+		total_creations++;
+		num_of_mutations++;
+		// console.log("total_creations: " + total_creations);
+		var mutation_cons = 1/settings.mutation_rate;
+		var mutation = Math.floor((Math.random()*mutation_cons)+0);
+		// console.log(mutation*settings.mutation_rate);
+		if(mutation*settings.mutation_rate>=0.99)
 		{
+			num_of_mutations++;
+			// console.log("number of mutations: " + num_of_mutations);
+			
 			var can_mutate = ["speed","eyesightfactor","threshold","linger_rate","danger_distance","danger_time","store_using_threshold","sex_desire","sex_desire","patrol_threshold"];
 			var ran_attr = Math.floor((Math.random()*can_mutate.length)+0);
 			var mut_attr = can_mutate[ran_attr];
 			var new_attr = Math.floor((Math.random()*settings[mut_attr])+0);
-			console.log("mutated:  attr was:"+cr_data[mut_attr]+ " now:"+new_attr);
+			// console.log("mutated:  attr was:"+cr_data[mut_attr]+ " now:"+new_attr);
 			cr_data[mut_attr] = new_attr;
 		}
 		
@@ -876,10 +889,10 @@ function touch(me,to,distance)
 		if((my_type=="hunter" && his_type=="prey") || (my_type=="prey" && his_type=="food"))
 		{
 			var new_energy = parseInt(my_cr.energy)+parseInt(to_cr.energy/2);
-			if(new_energy>200)
+			if(new_energy>settings.energy)
 			{
-				creatures[me].energy = 200;
-				creatures[me].store = new_energy-200;
+				creatures[me].energy = settings.energy;
+				creatures[me].store = new_energy-settings.energy;
 				creatures[me].mode = "sleep";
 				mode_color(me);
 			}
@@ -975,4 +988,59 @@ function tag(me,from,action) {
 	return timer;
 }
 
+function create_animals()
+{
+	var animal_number = $(".hunter").size() + $(".prey").size();
+	var left = animal_size - animal_number;
+	var hunter_copied = 0;
+	var prey_copied = 0;
+	for(var i=0;i<left;i++)
+	{
+		if($(".hunter").size()>=animal_size/4)
+		{
+			var id = mark_oldest("prey");
+			if(!id || hunter_copied>=1)
+			{
+				// console.log("newly created");
+				var obj = {type:"prey"};
+			}
+			else
+			{
+				// console.log("copied: "+id);
+				hunter_copied++;
+				var obj = creatures[id];
+			}
+			create_item(obj);
+		}
+		else
+		{
+			var id = mark_oldest("hunter");
+			if(!id || hunter_copied>=1)
+			{
+				// console.log("newly created");
+				var obj = {type:"hunter"};
+			}
+			else
+			{
+				// console.log("copied: "+id);
+				hunter_copied++;
+				var obj = creatures[id];
+			}
+			create_item(obj);
+		}
+		
+	}
+	setTimeout("create_animals()",10000);
+}
 
+function create_plants()
+{
+	var plant_number = $(".food").size();
+	var left = plant_size - plant_number;
+	for(var i=0;i<left;i++)
+	{
+		var obj = {type:"food",speed:0,eyesightfactor:0};
+		create_item(obj);
+	}
+	setTimeout("create_plants()",15000);
+}
