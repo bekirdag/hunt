@@ -22,15 +22,17 @@
 			
 				if($(".hunter").size()>=animal_size/4)
 				{
-					create_item("prey");
+					var obj = {type:"prey"};
+					create_item(obj);
 				}
 				else
 				{
-					create_item("hunter");
+					var obj = {type:"hunter"};
+					create_item(obj);
 				}
 				
 			}
-			setTimeout("create_animals()",20000);
+			setTimeout("create_animals()",60000);
 		}
 		
 		function create_plants()
@@ -39,9 +41,10 @@
 			var left = plant_size - plant_number;
 			for(var i=0;i<left;i++)
 			{
-				create_item("food",0,0);
+				var obj = {type:"food",speed:0,eyesightfactor:0};
+				create_item(obj);
 			}
-			setTimeout("create_plants()",3000);
+			setTimeout("create_plants()",15000);
 		}
 	
 		$(document).ready(function(){
