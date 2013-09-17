@@ -39,7 +39,7 @@ Creature = {
 		var id = Math.floor((Math.random()*1000)+0);
 		if($('#hunter').length>0)
 		{
-			return this.rand_id(type);
+			return Creature.rand_id(type);
 		}
 		else
 		{
@@ -52,26 +52,26 @@ Creature = {
 		var ran_num = Math.floor((Math.random()*100)+0);
 		ran_num = (ran_num>50) ? 1 : 0;
 		var ran_type = types[ran_num];
-		var ran_speed = Math.floor((Math.random()*this.settings.speed)+0);
-		var ran_eyesightfactor = Math.floor((Math.random()*this.settings.eyesightfactor)+10);
-		var ran_x = Math.floor((Math.random()*this.window_w)+0);
-		var ran_y = Math.floor((Math.random()*this.window_h)+0);
+		var ran_speed = Math.floor((Math.random()*Creature.settings.speed)+0);
+		var ran_eyesightfactor = Math.floor((Math.random()*Creature.settings.eyesightfactor)+10);
+		var ran_x = Math.floor((Math.random()*Creature.window_w)+0);
+		var ran_y = Math.floor((Math.random()*Creature.window_h)+0);
 		var patrolx = 0;
 		var patroly = 0;
 		var patrolset = "false";
-		var ran_energy = Math.floor((Math.random()*this.settings.energy)+10);
-		var ran_threshold = Math.floor((Math.random()*this.settings.threshold)+0);
-		var ran_danger_time = Math.floor((Math.random()*this.settings.danger_time)+1);
-		var ran_linger_rate = Math.floor((Math.random()*this.settings.linger_rate)+0);
-		var ran_danger_distance = Math.floor((Math.random()*this.settings.danger_distance)+0);
+		var ran_energy = Math.floor((Math.random()*Creature.settings.energy)+10);
+		var ran_threshold = Math.floor((Math.random()*Creature.settings.threshold)+0);
+		var ran_danger_time = Math.floor((Math.random()*Creature.settings.danger_time)+1);
+		var ran_linger_rate = Math.floor((Math.random()*Creature.settings.linger_rate)+0);
+		var ran_danger_distance = Math.floor((Math.random()*Creature.settings.danger_distance)+0);
 		var ran_gender = Math.floor((Math.random()*100)+0);
-		var ran_store = Math.floor((Math.random()*this.settings.store)+0);
-		var ran_store_using_threshold = Math.floor((Math.random()*this.settings.store_using_threshold)+0);
-		var ran_sex_desire = Math.floor((Math.random()*this.settings.sex_desire)+0);
-		var ran_sex_threshold = Math.floor((Math.random()*this.settings.sex_threshold)+0);
+		var ran_store = Math.floor((Math.random()*Creature.settings.store)+0);
+		var ran_store_using_threshold = Math.floor((Math.random()*Creature.settings.store_using_threshold)+0);
+		var ran_sex_desire = Math.floor((Math.random()*Creature.settings.sex_desire)+0);
+		var ran_sex_threshold = Math.floor((Math.random()*Creature.settings.sex_threshold)+0);
 		var ran_patrol_threshold = Math.floor((Math.random()*ran_threshold)+0);
 		ran_gender = (ran_gender>50) ? "m" : "f";
-		var ran_color = this.get_random_color();
+		var ran_color = Creature.get_random_color();
 		type = (!data.hasOwnProperty("type")) ? ran_type : data.type;
 		speed = (!data.hasOwnProperty("speed")) ? ran_speed : data.speed;
 		eyesightfactor = (!data.hasOwnProperty("eyesightfactor")) ? ran_eyesightfactor : data.eyesightfactor;
@@ -86,61 +86,59 @@ Creature = {
 		linger_rate = (!data.hasOwnProperty("linger_rate")) ? ran_linger_rate : data.linger_rate;
 		danger_distance = (!data.hasOwnProperty("danger_distance")) ? ran_danger_distance : data.danger_distance;
 		gender = (!data.hasOwnProperty("gender")) ? ran_gender : data.gender;
+		age = (!data.hasOwnProperty("age")) ? 0 : data.age;
 		store = 0;
 		store_using_threshold = (!data.hasOwnProperty("store_using_threshold")) ? ran_store_using_threshold : data.store_using_threshold;
 		sex_desire = (!data.hasOwnProperty("sex_desire")) ? ran_sex_desire : data.sex_desire;
 		sex_threshold = (!data.hasOwnProperty("sex_threshold")) ? ran_sex_threshold : data.sex_threshold;
 		patrol_threshold = (!data.hasOwnProperty("patrol_threshold")) ? ran_patrol_threshold : data.patrol_threshold;
 		border_radius = (type=="hunter") ? 3 : 10;
-		var ran_id = this.rand_id(type);
+		var ran_id = Creature.rand_id(type);
 		var danger_time_long = danger_time;
 		var svg = $('#canvas').svg('get');
 
-		if(type=="hunter")
+		if(Creature.not_exists(ran_id))
 		{
-			svg.rect(x, y, 20, 20,
-			{fill: color, id:ran_id, class: 'org '+ type});
-
-		}
-		else if(type=="prey")
-		{
-			svg.circle(x, y, 10, 
+			if(type=="hunter")
+			{
+				svg.rect(x, y, 20, 20,
 				{fill: color, id:ran_id, class: 'org '+ type});
+			}
+			else if(type=="prey")
+			{
+				svg.circle(x, y, 10, 
+					{fill: color, id:ran_id, class: 'org '+ type});
+			}
+			else if(type=="food")
+			{
+				svg.circle(x, y, 5, 
+					{fill: color, id:ran_id, class: 'org '+ type});
+			}	
+		
+			Creature.creatures[ran_id] = {x:x, y:y, width:10, height: 10, r:10, fill: color, mode: 'sleep', id:ran_id, age:age, type:type, color:color, sex_desire:sex_desire, sex_threshold:sex_threshold, store:store, store_using_threshold:store_using_threshold, gender:gender, danger_distance:danger_distance, linger_rate:linger_rate, threshold:threshold, speed:speed, eyesightfactor:eyesightfactor, class: 'org '+ family, family:family, energy:energy, danger_time: danger_time, danger_time_long:danger_time_long, patrolx: patrolx, patroly:patroly, patrolset:patrolset, patrol_threshold:patrol_threshold};
+			Creature.creature_start(ran_id);
 		}
-		else if(type=="food")
-		{
-			svg.circle(x, y, 5, 
-				{fill: color, id:ran_id, class: 'org '+ type});
-		}	
-		this.creatures[ran_id] = {x:x, y:y, width:10, height: 10, r:10, fill: color, mode: 'sleep', id:ran_id, age:0, type:type, color:color, sex_desire:sex_desire, sex_threshold:sex_threshold, store:store, store_using_threshold:store_using_threshold, gender:gender, danger_distance:danger_distance, linger_rate:linger_rate, threshold:threshold, speed:speed, eyesightfactor:eyesightfactor, class: 'org '+ family, family:family, energy:energy, danger_time: danger_time, danger_time_long:danger_time_long, patrolx: patrolx, patroly:patroly, patrolset:patrolset, patrol_threshold:patrol_threshold};
-
-		this.creature_start(ran_id);
+		
 		return ran_id;
 	},
-	check_exists: function(id)
+	not_exists: function(id)
 	{
-		if(this.creatures[id] == undefined){
-			// console.log(id);
+		if(typeof Creature.creatures[id] === "undefined"){
 		   return true;
 		}
 		else
 		{
-			return true;
+			return false;
 		}
 	},
 	creature_start: function(id)
 	{
-		// console.log(this.creatures[id]);
-		if(!this.check_exists(id))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[id];
+		var my_cr = Creature.creatures[id];
 		var type = my_cr.type;
 
 		if(type=="prey" || type=="hunter")
 		{
-			this.keep_going(type,id);
+			Creature.keep_going(type,id);
 			$("#"+id).attr("stroke-width","3");
 		}
 		// $(".org").draggable();
@@ -179,11 +177,8 @@ Creature = {
 	},
 	info_box: function (id)
 	{
-		if(!this.check_exists(id))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[id];
+		// if(Creature.not_exists(id)){return false;}
+		var my_cr = Creature.creatures[id];
 		var item_html = "<ul>\
 			<li>Age: "+my_cr.age+"</li>\
 			<li>Speed: "+my_cr.speed+"</li>\
@@ -205,37 +200,34 @@ Creature = {
 			<li>Family: "+my_cr.family+"</li>\
 		</ul>";
 		$("#oldest").html(item_html);
-		this.timers["info_box"] = setTimeout("Creature.info_box('"+id+"')",1000);
+		Creature.timers["info_box"] = setTimeout("Creature.info_box('"+id+"')",1000);
 	},
 	keep_going : function (type,id)
 	{
-		if(!this.check_exists(id))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[id];
-		var energy = this.energy_control(id);
+
+		var my_cr = Creature.creatures[id];
+		var energy = Creature.energy_control(id);
 		if(energy)
 		{
 			if(type=="hunter")
 			{
-				this.creatures[id].mode = "hunt";
-				this.mode_color(id);
+				Creature.creatures[id].mode = "hunt";
+				Creature.mode_color(id);
 
-				var timer = this.tag(id,".prey","catch");
+				var timer = Creature.tag(id,".prey","catch");
 			}
 			else if(type=="prey")
 			{
-				this.check_predator(id,"hunter");
+				Creature.check_predator(id,"hunter");
 				if(my_cr.danger_time>0){
-					var timer = this.tag(id,".hunter","run");
+					var timer = Creature.tag(id,".hunter","run");
 				}
 				else if(my_cr.danger_time==0)
 				{
-					this.creatures[id].mode = "hunt";
-					this.mode_color(id);
+					Creature.creatures[id].mode = "hunt";
+					Creature.mode_color(id);
 
-					var timer = this.tag(id,".food","catch");
+					var timer = Creature.tag(id,".food","catch");
 				}
 			}
 		}
@@ -247,59 +239,51 @@ Creature = {
 			{
 				if(type=="hunter")
 				{
-					this.creatures[id].mode = "sex";
-					this.mode_color(id);
+					Creature.creatures[id].mode = "sex";
+					Creature.mode_color(id);
 
-					var timer = this.tag(id,".hunter","catch");
+					var timer = Creature.tag(id,".hunter","catch");
 				}
 				else if(type=="prey")
 				{
-					this.check_predator(id,"hunter");
+					Creature.check_predator(id,"hunter");
 					if(my_cr.danger_time>0){
-						var timer = this.tag(id,".hunter","run");
+						var timer = Creature.tag(id,".hunter","run");
 					}
 					else if(my_cr.danger_time==0)
 					{
-						this.creatures[id].mode = "sex";
-						this.mode_color(id);
+						Creature.creatures[id].mode = "sex";
+						Creature.mode_color(id);
 
-						var timer = this.tag(id,".prey","catch");
+						var timer = Creature.tag(id,".prey","catch");
 					}
 				}
 			}
 			else
 			{
 				if(type=="prey"){
-					this.check_predator(id,"hunter");
+					Creature.check_predator(id,"hunter");
 					if(my_cr.danger_time>0){
-						this.creatures[id].mode=="danger";
+						Creature.creatures[id].mode=="danger";
 
-						var timer = this.tag(id,".hunter","run");
+						var timer = Creature.tag(id,".hunter","run");
 					}
 					else if(my_cr.danger_time==0)
 					{
-						this.creatures[id].mode = "sleep";
-						this.mode_color(id);
+						Creature.creatures[id].mode = "sleep";
+						Creature.mode_color(id);
 
 						var timer = 1000;
 					}
 				}
 			}
 		}
-		// clearTimeout(timers["this.keep_going"+id]);
-		this.timers["keep_going"+id] = setTimeout("Creature.keep_going('"+type+"','"+id+"')",timer);
+		// clearTimeout(timers["Creature.keep_going"+id]);
+		Creature.timers["keep_going"+id] = setTimeout("Creature.keep_going('"+type+"','"+id+"')",timer);
 	},
 	check_predator: function (me,run_from)
 	{
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		if(!this.check_exists(run_from))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[me];
+		var my_cr = Creature.creatures[me];
 		// var me_o = $("#"+me);
 		var danger_time = my_cr.danger_time;
 		var mode = my_cr.mode;
@@ -339,12 +323,10 @@ Creature = {
 	{
 		$(".org").each(function(){
 			var this_id = $(this).attr("id");
+			if(Creature.not_exists(this_id)){return false;}
 			var my_cr = Creature.creatures[this_id];
-			if(!Creature.check_exists(this_id))
-			{
-				return false;
-			}
 			var reduce = -1;
+
 			if(my_cr.mode=="danger" || my_cr.mode=="hunt")
 			{
 				reduce = -2;
@@ -379,7 +361,6 @@ Creature = {
 			}
 
 			if (danger_time>0) {
-				// console.log(attr);
 			    my_cr.danger_time = danger_time-1;
 
 			}
@@ -390,7 +371,7 @@ Creature = {
 	},
 	mode_color:function(me)
 	{
-		var my_cr = this.creatures[me];
+		var my_cr = Creature.creatures[me];
 		switch (my_cr.mode)
 		{
 			case "danger":
@@ -413,7 +394,7 @@ Creature = {
 	},
 	energy_control:function(id)
 	{
-		var my_cr = this.creatures[id];
+		var my_cr = Creature.creatures[id];
 		var energy = parseInt(my_cr.energy);
 		var store = parseInt(my_cr.store);
 		var threshold = parseInt(my_cr.threshold);
@@ -430,77 +411,67 @@ Creature = {
 	},
 	energy_change: function (id,num)
 	{
-		if(!this.check_exists(id))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[id];
+
+		var my_cr = Creature.creatures[id];
 
 		if(my_cr.mode=="sleep")
 		{
 			if(my_cr.store>0 && my_cr.store>my_cr.store_using_threshold)
 			{
 				var new_level = parseInt(my_cr.store)+parseInt(num);
-				this.creatures[id].store = new_level;
+				Creature.creatures[id].store = new_level;
 			}
 			else
 			{
 				var new_level = parseInt(my_cr.energy)+parseInt(num);
-				this.creatures[id].energy = new_level;
+				Creature.creatures[id].energy = new_level;
 				if(new_level<=0)
 				{
-					delete this.creatures[id];
+					delete Creature.creatures[id];
 					var item = $("#"+id);
-					clearTimeout(this.timers["keep_going"+id]);
+					clearTimeout(Creature.timers["keep_going"+id]);
 					item.remove();
-					// var svg_item = document.getElementById(id);
-					// svg_item.parentNode.removeChild(svg_item);
 				}
 			}
 		}
 		else
 		{
 			var new_level = parseInt(my_cr.energy)+parseInt(num);
-			this.creatures[id].energy = new_level;
+			Creature.creatures[id].energy = new_level;
 			if(new_level<=0)
 			{
-				delete this.creatures[id];
+				delete Creature.creatures[id];
 				var item = $("#"+id);
-				// var svg_item = document.getElementById(id);
-				// svg_item.parentNode.removeChild(svg_item);
-				clearTimeout(this.timers["keep_going"+id]);
+				clearTimeout(Creature.timers["keep_going"+id]);
 				item.remove();
 			}
 		}
 	},
 	go: function (me,x,y) {
-		var my_cr = this.creatures[me];
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
+		var my_cr = Creature.creatures[me];
+
 		var me_o = $("#"+me);
 		var speed = my_cr.speed*(1/(parseInt(my_cr.store/30)+1));
 		var count = speed;
 		var in_edge_x = false;
 		var in_edge_y = false;
-		if(x>=this.window_w+20)
+		if(x>=Creature.window_w+20)
 		{
 			x = -9.99*2;
 			in_edge_x = true;
 		}
 		else if (x<-20){
-			x = this.window_w-0.02;
+			x = Creature.window_w-0.02;
 			in_edge_x = true;
 		}
 
-		if(y>=this.window_h+20)
+		if(y>=Creature.window_h+20)
 		{
 			y = -9.99*2;
 			in_edge_y = true;
 		}
 		else if (y<-20){
-			y = this.window_h-0.02;
+			y = Creature.window_h-0.02;
 			in_edge_y = true;
 		}
 
@@ -524,30 +495,20 @@ Creature = {
 			me_o.attr("cy",y);
 		}
 
-		this.creatures[me].x = x;
-		this.creatures[me].y = y;
+		Creature.creatures[me].x = x;
+		Creature.creatures[me].y = y;
 	},
 	get_atts: function (me)
 	{
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[me];
+		if(Creature.not_exists(me)){return false;}
+		var my_cr = Creature.creatures[me];
 
 		return {x:parseFloat(my_cr.x),y:parseFloat(my_cr.y),w:parseFloat(my_cr.width),h:parseFloat(my_cr.height)};
 	},
 	get_position: function (me,him,action) {
 		// him could be imaginary
-		var my_cr = this.creatures[me];
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		if(him!=="imaginary" && !this.check_exists(him)){
-		   return false;
-		}
-		var me_prop = this.get_atts(me);
+		var my_cr = Creature.creatures[me];
+		var me_prop = Creature.get_atts(me);
 		var my_x = me_prop.x;
 		var my_y = me_prop.y;
 
@@ -569,7 +530,7 @@ Creature = {
 			{
 				return false;
 			}
-			var his_prop = this.get_atts(him);
+			var his_prop = Creature.get_atts(him);
 			var his_x = his_prop.x;
 			var his_y = his_prop.y;
 
@@ -592,50 +553,44 @@ Creature = {
 
 		if(x2>0)
 		{
-			if(abs_x2<this.window_w/2){
+			if(abs_x2<Creature.window_w/2){
 				new_x_way = new_x_way * (-1);
 			}
 		}
 		else
 		{
-			if(abs_x2>this.window_w/2){
+			if(abs_x2>Creature.window_w/2){
 				new_x_way = new_x_way * (-1);
 			}
 		}
 
 		if(y2>0)
 		{
-			if(abs_y2<this.window_h/2){
+			if(abs_y2<Creature.window_h/2){
 				new_y_way = new_y_way * (-1);
 			}
 		}
 		else
 		{
-			if(abs_y2>this.window_h/2){
+			if(abs_y2>Creature.window_h/2){
 				new_y_way = new_y_way * (-1);
 			}
 		}
 
-		var final_x = new_x_way*my_speed*this.speed_factor + my_x;
-		var final_y = new_y_way*my_speed*this.speed_factor + my_y;
+		var final_x = new_x_way*my_speed*Creature.speed_factor + my_x;
+		var final_y = new_y_way*my_speed*Creature.speed_factor + my_y;
 
 		return {x:final_x,y:final_y,distance:distance};
 	},
 	get_saw: function (me,him)
 	{
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		if(!this.check_exists(him))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[me];
-		var to_cr = this.creatures[him];
 
-		var me_prop = this.get_atts(me);
-		var his_prop = this.get_atts(him);
+
+		var my_cr = Creature.creatures[me];
+		var to_cr = Creature.creatures[him];
+
+		var me_prop = Creature.get_atts(me);
+		var his_prop = Creature.get_atts(him);
 
 		var my_x = me_prop.x;
 		var my_y = me_prop.y;
@@ -652,8 +607,8 @@ Creature = {
 		var abs_x2 = Math.abs(x2);
 		var abs_y2 = Math.abs(y2);
 
-		var x2_alt = this.window_w - abs_x2;
-		var y2_alt = this.window_h - abs_y2;
+		var x2_alt = Creature.window_w - abs_x2;
+		var y2_alt = Creature.window_h - abs_y2;
 
 		x2 = (x2_alt<abs_x2) ? x2_alt : abs_x2;
 		y2 = (y2_alt<abs_y2) ? y2_alt : abs_y2;
@@ -666,14 +621,8 @@ Creature = {
 		return saw;
 	},
 	seeing: function (me,him,action) {
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		if(!this.check_exists(him))
-		{
-			return false;
-		}
+
+
 		var items = him;
 		var seeing = 0;
 		var pos = [];
@@ -700,10 +649,10 @@ Creature = {
 			}
 			else if(him.indexOf(".")==-1)
 			{
-				var eyesight = this.get_saw(me,him);
+				var eyesight = Creature.get_saw(me,him);
 				if(eyesight) 
 				{
-					new_position = this.get_position(me,items[i],action);
+					new_position = Creature.get_position(me,items[i],action);
 					pos[seeing]= {x:new_position.x,y:new_position.y,distance:new_position.distance,weight:0,element:items[i]};
 					total_distance += new_position.distance;
 					seeing++;
@@ -723,67 +672,51 @@ Creature = {
 
 	},
 	patrol: function (me){
-		var my_cr = this.creatures[me];
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
+		var my_cr = Creature.creatures[me];
+
 		if(my_cr.patrolset=="false")
 		{
-			var patrolx = Math.floor((Math.random()*this.window_w)+0);
-			var patroly = Math.floor((Math.random()*this.window_h)+0);
-			this.creatures[me].patrolset = "true";
-			this.creatures[me].patrolx = patrolx;
-			this.creatures[me].patroly = patroly;
+			var patrolx = Math.floor((Math.random()*Creature.window_w)+0);
+			var patroly = Math.floor((Math.random()*Creature.window_h)+0);
+			Creature.creatures[me].patrolset = "true";
+			Creature.creatures[me].patrolx = patrolx;
+			Creature.creatures[me].patroly = patroly;
 		}
-		var data = this.get_position(me,"imaginary","catch");
-		// console.log(data.distance);
+		var data = Creature.get_position(me,"imaginary","catch");
 		if(data.distance<10)
 		{
-			var patrolx = Math.floor((Math.random()*this.window_w)+0);
-			var patroly = Math.floor((Math.random()*this.window_h)+0);
-			this.creatures[me].patrolset = "true";
-			this.creatures[me].patrolx = patrolx;
-			this.creatures[me].patroly = patroly;
+			var patrolx = Math.floor((Math.random()*Creature.window_w)+0);
+			var patroly = Math.floor((Math.random()*Creature.window_h)+0);
+			Creature.creatures[me].patrolset = "true";
+			Creature.creatures[me].patrolx = patrolx;
+			Creature.creatures[me].patroly = patroly;
 		}
 		else
 		{
-			this.go(me,data.x,data.y);
+			Creature.go(me,data.x,data.y);
 		}
 	},
 	rand_choose: function (me,to){
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		if(!this.check_exists(to))
-		{
-			return false;
-		}
+
+
 		var ran_num = Math.floor((Math.random()*100)+0);
 		var item = (ran_num>50) ? me : to;
 		return item;
 	},
 	cross_two: function (me,to)
 	{
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		if(!this.check_exists(to))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[me];
-		var to_cr = this.creatures[to];
+
+
+		var my_cr = Creature.creatures[me];
+		var to_cr = Creature.creatures[to];
 
 		var new_energy = parseInt(my_cr.energy)-10;
-		this.creatures[me].energy = new_energy;
+		Creature.creatures[me].energy = new_energy;
 
 		var new_energy = parseInt(to_cr.energy)-10;
-		this.creatures[to].energy = new_energy;
+		Creature.creatures[to].energy = new_energy;
 
-		var my_prop = this.get_atts(me);
+		var my_prop = Creature.get_atts(me);
 		var my_x = my_prop.x;
 		var my_y = my_prop.y;
 
@@ -797,64 +730,51 @@ Creature = {
 		if(left>0)
 		{
 			var cr_data = {};
-			cr_data.type = this.creatures[this.rand_choose(me,to)].type;
-			cr_data.speed = this.creatures[this.rand_choose(me,to)].speed;
-			cr_data.eyesightfactor = this.creatures[this.rand_choose(me,to)].eyesightfactor;
+			cr_data.type = Creature.creatures[Creature.rand_choose(me,to)].type;
+			cr_data.speed = Creature.creatures[Creature.rand_choose(me,to)].speed;
+			cr_data.eyesightfactor = Creature.creatures[Creature.rand_choose(me,to)].eyesightfactor;
 			cr_data.x = my_x;
 			cr_data.y = my_y;
-			cr_data.color = this.creatures[this.rand_choose(me,to)].color;
-			cr_data.family = this.creatures[this.rand_choose(me,to)].family;
+			cr_data.color = Creature.creatures[Creature.rand_choose(me,to)].color;
+			cr_data.family = Creature.creatures[Creature.rand_choose(me,to)].family;
 			cr_data.energy = 150;
-			cr_data.threshold = this.creatures[this.rand_choose(me,to)].threshold;
-			cr_data.linger_rate = this.creatures[this.rand_choose(me,to)].linger_rate;
-			cr_data.danger_distance = this.creatures[this.rand_choose(me,to)].danger_distance;
-			cr_data.danger_time = this.creatures[this.rand_choose(me,to)].danger_time;
-			cr_data.gender = this.creatures[this.rand_choose(me,to)].gender;
+			cr_data.threshold = Creature.creatures[Creature.rand_choose(me,to)].threshold;
+			cr_data.linger_rate = Creature.creatures[Creature.rand_choose(me,to)].linger_rate;
+			cr_data.danger_distance = Creature.creatures[Creature.rand_choose(me,to)].danger_distance;
+			cr_data.danger_time = Creature.creatures[Creature.rand_choose(me,to)].danger_time;
+			cr_data.gender = Creature.creatures[Creature.rand_choose(me,to)].gender;
 			cr_data.store = 0;
-			cr_data.store_using_threshold = this.creatures[this.rand_choose(me,to)].store_using_threshold;
-			cr_data.sex_desire = this.creatures[this.rand_choose(me,to)].sex_desire;
-			cr_data.sex_threshold = this.creatures[this.rand_choose(me,to)].sex_threshold;
-			cr_data.patrol_threshold = this.creatures[this.rand_choose(me,to)].patrol_threshold;
+			cr_data.store_using_threshold = Creature.creatures[Creature.rand_choose(me,to)].store_using_threshold;
+			cr_data.sex_desire = Creature.creatures[Creature.rand_choose(me,to)].sex_desire;
+			cr_data.sex_threshold = Creature.creatures[Creature.rand_choose(me,to)].sex_threshold;
+			cr_data.patrol_threshold = Creature.creatures[Creature.rand_choose(me,to)].patrol_threshold;
 
-			this.total_creations++;
-			this.num_of_mutations++;
-			// console.log("total_creations: " + total_creations);
-			var mutation_cons = 1/this.settings.mutation_rate;
+			Creature.total_creations++;
+			var mutation_cons = 1/Creature.settings.mutation_rate;
 			var mutation = Math.floor((Math.random()*mutation_cons)+0);
-			// console.log(mutation*this.settings.mutation_rate);
-			if(mutation*this.settings.mutation_rate>=0.99)
+			if(mutation*Creature.settings.mutation_rate>=0.99)
 			{
-				num_of_mutations++;
-				// console.log("number of mutations: " + num_of_mutations);
-
+				Creature.num_of_mutations++;
 				var can_mutate = ["speed","eyesightfactor","threshold","linger_rate","danger_distance","danger_time","store_using_threshold","sex_desire","sex_desire","patrol_threshold"];
 				var ran_attr = Math.floor((Math.random()*can_mutate.length)+0);
 				var mut_attr = can_mutate[ran_attr];
-				var new_attr = Math.floor((Math.random()*this.settings[mut_attr])+0);
-				// console.log("mutated:  attr was:"+cr_data[mut_attr]+ " now:"+new_attr);
+				var new_attr = Math.floor((Math.random()*Creature.settings[mut_attr])+0);
 				cr_data[mut_attr] = new_attr;
 			}
 
-			var id = this.create_item(cr_data);
+			var id = Creature.create_item(cr_data);
 		}
 	},
 	touch: function (me,to,distance)
 	{
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		if(!this.check_exists(to))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[me];
-		var to_cr = this.creatures[to];
+		if(Creature.not_exists(to)){return false;}
+		var my_cr = Creature.creatures[me];
+		var to_cr = Creature.creatures[to];
 
 		var my_type = my_cr.type;
 		var his_type = to_cr.type;
 
-		var his_prop = this.get_atts(to);
+		var his_prop = Creature.get_atts(to);
 		var to_w = his_prop.w;
 		var to_h = his_prop.h;
 
@@ -865,52 +785,42 @@ Creature = {
 			if((my_type=="hunter" && his_type=="prey") || (my_type=="prey" && his_type=="food"))
 			{
 				var new_energy = parseInt(my_cr.energy)+parseInt(to_cr.energy/2);
-				if(new_energy>this.settings.energy)
+				if(new_energy>Creature.settings.energy)
 				{
-					this.creatures[me].energy = this.settings.energy;
-					this.creatures[me].store = new_energy-this.settings.energy;
-					this.creatures[me].mode = "sleep";
-					this.mode_color(me);
+					Creature.creatures[me].energy = Creature.settings.energy;
+					Creature.creatures[me].store = new_energy-Creature.settings.energy;
+					Creature.creatures[me].mode = "sleep";
+					Creature.mode_color(me);
 				}
 				else
 				{
-					this.creatures[me].energy = new_energy;
-					this.creatures[me].mode = "sleep";
-					this.mode_color(me);
+					Creature.creatures[me].energy = new_energy;
+					Creature.creatures[me].mode = "sleep";
+					Creature.mode_color(me);
 
 				}
+				delete Creature.creatures[to];
 				var to_o = $("#"+to);
-				clearTimeout(this.timers["keep_going"+to]);
+				clearTimeout(Creature.timers["keep_going"+to]);
 				to_o.remove();
-				// var svg_item = document.getElementById(to);
-				// svg_item.parentNode.removeChild(svg_item);
 			}
 			else if (my_type == his_type)
 			{
-				this.creatures[me].sex_desire = 0;
-				this.creatures[to].sex_desire = 0;
-				this.cross_two(me,to);
-				this.creatures[me].mode = "sleep";
-				this.mode_color(me);
-				this.mode_color(to);
-				this.creatures[to].mode = "sleep";
-
+				Creature.creatures[me].sex_desire = 0;
+				Creature.creatures[to].sex_desire = 0;
+				Creature.cross_two(me,to);
+				Creature.creatures[me].mode = "sleep";
+				Creature.mode_color(me);
+				Creature.mode_color(to);
+				Creature.creatures[to].mode = "sleep";
 			}
 		}
 	},
 	tag: function (me,from,action) {
-		if(!this.check_exists(me))
-		{
-			return false;
-		}
-		if(!this.check_exists(from))
-		{
-			return false;
-		}
-		var my_cr = this.creatures[me];
+		var my_cr = Creature.creatures[me];
 		from_string = from;
 		from = from.split(",");
-		var saw = this.seeing(me,from,action);
+		var saw = Creature.seeing(me,from,action);
 		if(saw)
 		{
 			var pos = saw.items;
@@ -921,7 +831,7 @@ Creature = {
 			for (var i=0; i < pos.length; i++) {
 				pos[i].weight = total_distance/pos[i].distance;
 				total_we += pos[i].weight;
-				this.touch(me,pos[i].element,pos[i].distance);
+				Creature.touch(me,pos[i].element,pos[i].distance);
 			};
 			for (var i=0; i < pos.length; i++) {
 				percent = pos[i].weight/total_we;
@@ -938,23 +848,23 @@ Creature = {
 				}
 			};
 
-			this.go(me,posx,posy);
+			Creature.go(me,posx,posy);
 			var timer = 50;
 		}
 		else
 		{
-			if(this.creatures[me].mode == "hunt" || this.creatures[me].mode == "sex")
+			if(Creature.creatures[me].mode == "hunt" || Creature.creatures[me].mode == "sex")
 			{
 				if(my_cr.energy<my_cr.patrol_threshold)
 				{
-					this.creatures[me].mode = "patrol";
-					this.patrol(me);
-					this.mode_color(me);
+					Creature.creatures[me].mode = "patrol";
+					Creature.patrol(me);
+					Creature.mode_color(me);
 				}
 				else
 				{
-					this.creatures[me].mode = "sleep";
-					this.mode_color(me);
+					Creature.creatures[me].mode = "sleep";
+					Creature.mode_color(me);
 				}
 			}
 			var timer = 50;
@@ -972,46 +882,43 @@ Creature = {
 		{
 			if($(".hunter").size()>=animal_size/4)
 			{
-				if(this.settings.copy_hunter>0)
+				if(Creature.settings.copy_hunter>0)
 				{
-					var id = this.mark_oldest("prey");
+					var id = Creature.mark_oldest("prey");
 				}
 				
-				if(!id || hunter_copied>=this.settings.copy_hunter)
+				if(!id || hunter_copied>=Creature.settings.copy_hunter)
 				{
-					// console.log("newly created");
 					var obj = {type:"prey"};
 				}
 				else
 				{
-					// console.log("copied: "+id);
 					hunter_copied++;
-					var obj = this.creatures[id];
+					var obj = Creature.creatures[id];
 				}
-				this.create_item(obj);
+				Creature.create_item(obj);
 			}
 			else
 			{
-				if(this.settings.copy_prey>0)
+				if(Creature.settings.copy_prey>0)
 				{
-					var id = this.mark_oldest("hunter");
+					var id = Creature.mark_oldest("hunter");
 				}
-				if(!id || hunter_copied>=this.settings.copy_prey)
+				if(!id || hunter_copied>=Creature.settings.copy_prey)
 				{
-					// console.log("newly created");
 					var obj = {type:"hunter"};
 				}
 				else
 				{
-					// console.log("copied: "+id);
 					hunter_copied++;
-					var obj = this.creatures[id];
+					var obj = Creature.creatures[id];
 				}
-				this.create_item(obj);
+				Creature.create_item(obj);
 			}
 
 		}
-		setTimeout("Creature.create_animals()",10000);
+		Creature.timers["create_animals"] = setTimeout("Creature.create_animals()",Math.floor((Math.random()*40000)+10000));
+		// console.log("size of habitat:" + Creature.obj_size(Creature.creatures));
 	},
 	create_plants: function ()
 	{
@@ -1020,8 +927,75 @@ Creature = {
 		for(var i=0;i<left;i++)
 		{
 			var obj = {type:"food",speed:0,eyesightfactor:0};
-			this.create_item(obj);
+			Creature.create_item(obj);
 		}
-		setTimeout("Creature.create_plants()",15000);
+		Creature.timers["create_plants"] = setTimeout("Creature.create_plants()",Math.floor((Math.random()*30000)+6000));
+	},
+	read_from_file: function()
+	{
+		// Creature.create_animals();
+		// Creature.create_plants();
+		// Creature.kill_slowly();
+		// Creature.save_creatures();
+		
+		$.post( "inc/save.php", {
+			action: "read",
+		})
+		.done(function( data ) {
+			Creature.creatures = JSON.parse(data);
+			if(Creature.obj_size(Creature.creatures)>0)
+			{
+				for (key in Creature.creatures) {
+			        if (Creature.creatures.hasOwnProperty(key))
+					{
+						Creature.create_item(Creature.creatures[key]);
+					}
+			    }
+			}
+		
+			Creature.create_animals();
+			Creature.create_plants();
+			Creature.kill_slowly();
+			Creature.save_creatures();
+		});
+	},
+	save_creatures: function()
+	{
+		var alive_creatures = {};
+		$(".hunter").each(function(){
+			var org_id = $(this).attr("id");
+			alive_creatures[org_id] = Creature.creatures[org_id];
+		});
+		$(".prey").each(function(){
+			var org_id = $(this).attr("id");
+			alive_creatures[org_id] = Creature.creatures[org_id];
+		});
+		$.post( "inc/save.php", {
+	    	action: "write",
+			data: JSON.stringify(alive_creatures),
+	  	});
+		Creature.timers["save_creatures"] = setTimeout("Creature.save_creatures()",60000);
+	},
+	obj_size : function(obj) {
+	    var size = 0, key;
+	    for (key in obj) {
+	        if (obj.hasOwnProperty(key)) size++;
+	    }
+	    return size;
+	},
+	start : function()
+	{
+		Creature.read_from_file();
+		Creature.clean_memory();
+	},
+	clean_memory : function()
+	{
+		var alive_creatures = {};
+		$(".org").each(function(){
+			var org_id = $(this).attr("id");
+			alive_creatures[org_id] = Creature.creatures[org_id];
+		});
+		Creature.creatures = alive_creatures;
+		Creature.timers["clean_memory"] = setTimeout("Creature.clean_memory()",60000);
 	}
 }

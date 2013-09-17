@@ -10,7 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css" media="all">
 	<script type="text/javascript">
 		var animal_size = 30;
-		var plant_size = 70;
+		var plant_size = 60;
 	
 		$(document).ready(function(){
 			
@@ -19,9 +19,7 @@
 			$("#mark_oldest_prey").hide();
 			
 			$("#start").click(function(){
-				Creature.create_animals();
-				Creature.create_plants();
-				Creature.kill_slowly();
+				Creature.start();
 				
 				$(this).hide();
 				
@@ -35,6 +33,11 @@
 			$("#mark_oldest_prey").click(function(){
 				Creature.mark_oldest("prey");
 			});
+		});
+		
+		$(window).resize(function () {
+		    Creature.window_w = $(window).width();
+		    Creature.window_h = $(window).height();
 		});
 	</script>
 </head>
