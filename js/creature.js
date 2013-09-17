@@ -145,8 +145,8 @@ Creature = {
 		}
 		// $(".org").draggable();
 		$("#"+id).click(function(){
-			clearTimeout(this.timers["info_box"]);
-			this.info_box(id);
+			clearTimeout(Creature.timers["info_box"]);
+			Creature.info_box(id);
 			$(".org").attr("stroke-width",3);
 			$("#"+id).attr("stroke-width",10);
 		});
@@ -156,7 +156,7 @@ Creature = {
 		var max_age = 0;
 		var id = "";
 		$("."+type).each(function(){
-			var item = this.creatures[$(this).attr("id")];
+			var item = Creature.creatures[$(this).attr("id")];
 
 			if(parseInt(item.age)>max_age)
 			{
@@ -168,8 +168,8 @@ Creature = {
 		{
 			$(".org").attr("stroke-width",3);
 			$("#"+id).attr("stroke-width",10);
-			clearTimeout(this.timers["info_box"]);
-			this.info_box(id);
+			clearTimeout(Creature.timers["info_box"]);
+			Creature.info_box(id);
 			return id;
 		}
 		else
