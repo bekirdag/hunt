@@ -19,11 +19,12 @@
 			$("#mark_oldest_prey").hide();
 			
 			$("#start").click(function(){
-				create_animals();
-				create_plants();
-
+				Creature.create_animals();
+				Creature.create_plants();
+				Creature.kill_slowly();
+				
 				$(this).hide();
-				kill_slowly();
+				
 				$("#mark_oldest_hunter").show();
 				$("#mark_oldest_prey").show();
 			});
