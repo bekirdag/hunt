@@ -6,35 +6,8 @@ body,#canvas{
 	font-size:12px;
 }
 
-.hunter {
+.prey, .food, .hunter {
 	position: absolute;
-	width: 20px; 
-	height: 20px;
-	top: 150px; 
-	left: 1000px;
-	background: #ff0000;
-	border-radius: 3px;
-	-webkit-backface-visibility:hidden;
-}
-
-.prey {
-	position: absolute;
-	width: 20px; 
-	height: 20px;
-	top: 140px; 
-	left: 600px;
-	background: #B2BA16;
-	border-radius: 10px;
-	-webkit-backface-visibility:hidden;
-}
-
-.food {
-	position: absolute;
-	width: 10px; 
-	height: 10px;
-	background: green;
-	border-radius: 3px;
-	-webkit-backface-visibility:hidden;
 }
 
 #start, #mark_oldest_hunter, #mark_oldest_prey{
@@ -58,36 +31,13 @@ body,#canvas{
 	top: 20px; 
 	right: 20px;
 /*	cursor:pointer;*/
-	width:120px;
+	width:200px;
 	background:white;
+	font-size:16px;
 }
 
 ul{
 	margin:0;
 	padding:0 0 0 10px;
-}
-
-.danger{
-	background: red !important;
-}
-
-.hunt{
-	background: blue !important;
-}
-
-.sex{
-	background: #F799B9 !important;
-}
-
-.patrol{
-	background: orange !important;
-}
-
-.sleep{
-	background: gray !important;
-}
-
-.oldest{
-	border:3px solid black;
 }
 
